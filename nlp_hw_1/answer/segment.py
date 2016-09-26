@@ -55,8 +55,8 @@ class Pdist(dict):
     def __call__(self, key):
         if key in self: return math.log(float(self[key])/float(self.N))
         elif len(key) == 1: return math.log(self.missingfn(key, self.N))
+        elif key.isdigit(): return math.log(self.missingfn(key, self.N))
         else:   return None
-
 
 class PdistJoint(dict):
     "A probability distribution estimated from counts in datafile."
@@ -73,18 +73,43 @@ class PdistJoint(dict):
             self[utf8key] = self.get(utf8key, 0) + int(freq)
             self.maxlen = max(len(utf8key), self.maxlen)
         self.N = float(N or sum(self.itervalues()))
-        self.missingfn = missingfn or (lambda k, N: 1. / N)
+        self.missingfn = missingfn or (lambda k, N: 1./N)
 
     def __call__(self, key):
-        if key in self:
-            return math.log(float(self[key]) / float(self.N))
-        elif len(key) == 1:
-            return math.log(self.missingfn(key, self.N))
+        if key in self: return math.log(float(self[key]) / float(self.N))
+        elif len(key) == 3 : return math.log(self.missingfn(key, self.N))
+        elif key.isdigit():  return  math.log(self.missingfn(key, self.N))
         else:
             return None
 
+class PdistUnigram(dict):
+    "A probability distribution estimated from counts in datafile."
+
+    def __init__(self, filename, sep='\t', N=None, missingfn=None):
+        self.maxlen = 0
+        for line in file(filename):
+            tuple, freq = line.split(sep)
+            (tuple_1, tuple_2) = tuple.strip().split(" ")
+            try:
+                utf8key_1 = unicode(tuple_1, 'utf-8')
+                utf8key_2 = unicode(tuple_1, 'utf-8')
+            except:
+                raise ValueError("Unexpected error %s" % (sys.exc_info()[0]))
+            self[utf8key_1] = self.get(utf8key_1, 0) + int(freq)
+            self[utf8key_2] = self.get(utf8key_2, 0) + int(freq)
+            self.maxlen = max(max(len(utf8key_1), self.maxlen), len(utf8key_2))
+        self.N = float(N or sum(self.itervalues()))
+        self.missingfn = missingfn or (lambda k, N: 1./ N)
+
+    def __call__(self, key):
+        if key in self: return math.log(float(self[key]) / float(self.N))
+        elif len(key) == 1: return math.log(self.missingfn(key, self.N))
+        elif key.isdigit(): return math.log(self.missingfn(key, self.N))
+        else:
+            return None
 # the default segmenter does not use any probabilities, but you could ...
-Pw  = Pdist(opts.counts1w)
+#Pw  = Pdist(opts.counts1w)
+Pw  = PdistUnigram(opts.counts2w)
 PwJoint = PdistJoint(opts.counts2w)
 old = sys.stdout
 sys.stdout = codecs.lookup('utf-8')[-1](sys.stdout)
@@ -93,14 +118,22 @@ pq = Q.PriorityQueue()
 with open(opts.input) as f:
     for line in f:
         utf8line = unicode(line.strip(), 'utf-8')  
-        input = [i for i in utf8line]  # segmentation is one word per character in the input
+        input = [i for i in utf8line]
         chart = {}
-        for j in range(1,min(1 + Pw.maxlen,len(input))+1):
-            word = "".join(input[:j])
-            if Pw(word) is None:
-                    continue
+        for j in range(1,min(1 + PwJoint.maxlen,len(input))+1):
+            newWord = "".join(input[:j])
+            prev_word = unicode("<S>", 'utf-8');
+            joint_tuple = " ".join([prev_word, newWord]);
+            
+            if PwJoint(joint_tuple) is None:
+                    unigramProb = Pw(newWord);
+                    if unigramProb is None:
+                        continue
+                    else:
+                        newEntry = Entry(newWord, 0, unigramProb, None)
+                        pq.put(newEntry);   
             else:
-                pq.put(Entry(word, 0, Pw(word), None));
+                pq.put(Entry(newWord, 0, PwJoint(joint_tuple), None));
 
         ## Iteratively fill in chart[i] for all i ##
         while not pq.empty() :
@@ -116,27 +149,26 @@ with open(opts.input) as f:
              else :
                  chart[endIndex] = entry
             
-             for k in range(endIndex+1, min(endIndex + 1 + Pw.maxlen, len(input))+1): 
+             for k in range(endIndex+1, min(endIndex + 1 + PwJoint.maxlen, len(input))+1): 
                 newWord = "".join(input[endIndex:k])  
-                if Pw(newWord) is None:
-                    continue
-                else :
-                    prev_word = chart[endIndex].word;
-                    joint_tuple = " ".join([prev_word, newWord]);
-                    joint_prob1 = PwJoint(joint_tuple)
-
-                    joint_tuple = " ".join([newWord, prev_word]);
-                    joint_prob2 = PwJoint(joint_tuple)
-
-                    lam = 0.5
-
-                    if joint_prob2 is None and joint_prob1 is None:
-                        joint_prob = math.log((1-lam) * math.exp(Pw(newWord)))
+                prev_word = chart[endIndex].word
+                
+                #"".join(input[endIndex-1:endIndex])
+                joint_tuple = " ".join([prev_word, newWord]);
+                joint_prob = PwJoint(joint_tuple)
+                if joint_prob is None:
+                    unigramProb = Pw(newWord);
+                    lamb = 0.90
+                    if unigramProb is None:
+                        continue
                     else:
-                        joint_prob = max(joint_prob2, joint_prob1)
-                        # joint_prob = math.log(lam * math.exp(max(joint_prob2, joint_prob1)) + (1-lam)* math.exp(Pw(newWord)))
-
-                    newEntry = Entry(newWord, endIndex, entry.logProb + joint_prob - Pw(prev_word), entry)
+                        joint_prob =  math.log(0.000001 + (1./PwJoint.N) / (0.000001 * PwJoint.N  + math.exp(unigramProb)))
+                        #joint_prob = lamb * math.log(1./PwJoint.N) + unigramProb * (1-lamb)
+                    newEntry = Entry(newWord, endIndex, entry.logProb + joint_prob, entry)
+                    if(not(is_in_queue(newEntry,pq))):
+                        pq.put(newEntry);   
+                else :
+                    newEntry = Entry(newWord, endIndex, entry.logProb + joint_prob, entry)
                     if(not(is_in_queue(newEntry,pq))):
                         pq.put(newEntry);   
             

@@ -13,6 +13,7 @@ optparser.add_option("-i", "--inputfile", dest="input", default=os.path.join('..
 
 
 class Entry(object):
+    "Entry class, with all necessary properties."
     def __init__(self, word, startIndex, logProb, backptr):
         self.word = word
         self.startIndex = startIndex
@@ -22,7 +23,11 @@ class Entry(object):
     def __eq__(self, other):
         return self.word == other.word and self.startIndex == other.startIndex
     
+   
     def __cmp__(self, other):
+        '''
+            Using in reverse order, as we require decreasing order based on logProb
+        '''
         return cmp(other.logProb, self.logProb)
 
     def __str__(self, *args, **kwargs):
@@ -44,7 +49,7 @@ def avoid_long_words(key, N):
 digitRegex = re.compile(ur"^\d+\Z", re.UNICODE)
 
 class Pdist(dict):
-    "A probability distribution estimated from counts in datafile."
+    "A probability distribution estimated from counts in count1w.txt, for unigram model."
 
     def __init__(self, filename, sep='\t', N=None, missingfn=avoid_long_words):
         self.maxlen = 0 
@@ -64,7 +69,7 @@ class Pdist(dict):
         elif digitRegex.match(key): return 0.1
         else : return self.missingfn(key, self.N)
 
-# lambda to apply  Mercer Smoothing, ran various epoch to get this value     
+"lambda  for Mercer smoothing, ran various epoch to get this value"
 lamb = 0.5;   
 
 class PdistJoint(dict):
@@ -87,11 +92,10 @@ class PdistJoint(dict):
     def __call__(self, key):
             prev_word = key.split(" ")[0];
             new_word = key.split(" ")[1];
-            return lamb * ((float(self.get(key,0))/float(self.N)) / float(Pw(prev_word)))+ (1 - lamb) * float(Pw(new_word))
+            return lamb * ((float(self.get(key,0))/float(self.N)) / float(Pw(prev_word))) + (1 - lamb) * float(Pw(new_word))
         
 # the default segmenter does not use any probabilities, but you could ...
 Pw  = Pdist(opts.counts1w)
-#Pw = PdistUnigram(opts.counts2w)
 PwJoint = PdistJoint(opts.counts2w)
 old = sys.stdout
 sys.stdout = codecs.lookup('utf-8')[-1](sys.stdout)

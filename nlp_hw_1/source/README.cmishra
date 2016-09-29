@@ -1,0 +1,3 @@
+Implemented baseline unigram model.
+Worked on improvement of overall score by handling numbers and considering length of key in smoothing.
+Reviewed biagram code.

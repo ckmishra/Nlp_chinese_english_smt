@@ -8,7 +8,7 @@ except ImportError:
 optparser = optparse.OptionParser()
 optparser.add_option("-c", "--unigramcounts", dest='counts1w', default=os.path.join('../data', 'count_1w.txt'), help="unigram counts")
 optparser.add_option("-b", "--bigramcounts", dest='counts2w', default=os.path.join('../data', 'count_2w.txt'), help="bigram counts")
-optparser.add_option("-i", "--inputfile", dest="input", default=os.path.join('../data', 'input'), help="input file to segment")
+optparser.add_option("-i", "--inputfile", dest="input", default=os.path.join('../data', '1line'), help="input file to segment")
 (opts, _) = optparser.parse_args()
 
 class Entry(object):
@@ -54,9 +54,10 @@ class Pdist(dict):
 
     def __call__(self, key):
         if key in self: return math.log(float(self[key])/float(self.N))
-        elif len(key) == 1: return math.log(self.missingfn(key, self.N))
-        elif key.isdigit(): return 0
-        else:   return None
+        elif len(key) == 1 : return math.log(self.missingfn(key, self.N))
+        else : return None 
+            #return math.log(1./(self.N * 10**len(key)))
+
 
 # the default segmenter does not use any probabilities, but you could ...
 Pw  = Pdist(opts.counts1w)

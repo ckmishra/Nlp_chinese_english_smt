@@ -63,10 +63,8 @@ class Pdist(dict):
         if key in self: return float(self[key]) / float(self.N)
         elif digitRegex.match(key): return 0.1
         else : return self.missingfn(key, self.N)
-
-# lambda to apply  Mercer Smoothing, ran various epoch to get this value     
-lamb = 0.5;   
-
+     
+    
 class PdistJoint(dict):
     "A probability distribution estimated from counts in datafile."
     """ P(x,y) joint prob only """
@@ -85,13 +83,39 @@ class PdistJoint(dict):
         self.missingfn = missingfn or (lambda k, N: 1. / N)
 
     def __call__(self, key):
-            prev_word = key.split(" ")[0];
-            new_word = key.split(" ")[1];
-            return lamb * ((float(self.get(key,0))/float(self.N)) / float(Pw(prev_word)))+ (1 - lamb) * float(Pw(new_word))
+        if key in self:
+            return float(self[key]) / float(self.N)
+        else :
+            return None
         
+        
+class PdistUnigram(dict):
+    "A probability distribution estimated from counts in datafile."
+
+    def __init__(self, filename, sep='\t', N=None, missingfn=avoid_long_words):
+        self.maxlen = 0
+        for line in file(filename):
+            tuple, freq = line.split(sep)
+            (tuple_1, tuple_2) = tuple.strip().split(" ")
+            try:
+                utf8key_1 = unicode(tuple_1, 'utf-8')
+                utf8key_2 = unicode(tuple_2, 'utf-8')
+            except:
+                raise ValueError("Unexpected error %s" % (sys.exc_info()[0]))
+            self[utf8key_1] = self.get(utf8key_1, 0) + int(freq)
+            self[utf8key_2] = self.get(utf8key_2, 0) + int(freq)
+            self.maxlen = max(max(len(utf8key_1), self.maxlen), len(utf8key_2))
+        self.N = float(N or sum(self.itervalues()))
+        self.missingfn = missingfn or (lambda k, N: 1. / N)
+    
+    def __call__(self, key):
+        if key in self: return float(self[key]) / float(self.N)
+        elif digitRegex.match(key): return 0.1
+        else : return self.missingfn(key, self.N)
+
 # the default segmenter does not use any probabilities, but you could ...
-Pw  = Pdist(opts.counts1w)
-#Pw = PdistUnigram(opts.counts2w)
+# Pw  = Pdist(opts.counts1w)
+Pw = PdistUnigram(opts.counts2w)
 PwJoint = PdistJoint(opts.counts2w)
 old = sys.stdout
 sys.stdout = codecs.lookup('utf-8')[-1](sys.stdout)
@@ -109,10 +133,16 @@ with open(opts.input) as f:
             joint_prob = PwJoint(joint_tuple)
             
             unigramPrevProb = Pw(prev_word)
+
             if  joint_prob is None:
-                continue 
+                # print "Inside"
+                unigramProb = Pw(newWord)
+                if unigramProb is not None:
+                    newEntry = Entry(newWord, 0, math.log10(unigramProb), None)
+                    if(not(is_in_queue(newEntry, pq))):
+                       pq.put(newEntry);   
             else:
-                newEntry = Entry(newWord, 0, math.log10(joint_prob), None)
+                newEntry = Entry(newWord, 0, math.log10(joint_prob) - math.log10(unigramPrevProb), None)
                 if(not(is_in_queue(newEntry, pq))):
                     pq.put(newEntry);
         
@@ -141,9 +171,15 @@ with open(opts.input) as f:
                 unigramPrevProb = Pw(prev_word)
 
                 if joint_prob is None:
-                    continue
+                    # print "Inside"
+                    # continue
+                    unigramProb = Pw(nextword)
+                    if unigramProb is not None:
+                        newEntry = Entry(nextword, endIndex + 1, entry.logProb + math.log10(unigramProb), endIndex)
+                        if(not(is_in_queue(newEntry, pq))):
+                            pq.put(newEntry);
                 else :
-                   newEntry = Entry(nextword, endIndex + 1, entry.logProb + math.log10(joint_prob), endIndex)
+                   newEntry = Entry(nextword, endIndex + 1, entry.logProb + math.log10(joint_prob) - math.log10(unigramPrevProb), endIndex)
                    if(not(is_in_queue(newEntry, pq))):
                         pq.put(newEntry);   
             

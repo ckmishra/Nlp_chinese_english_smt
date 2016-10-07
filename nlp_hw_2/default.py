@@ -31,11 +31,34 @@ Inside the perceptron training loop:
 import perc
 import sys, optparse, os
 from collections import defaultdict
+from _elementtree import Element
 
 def perc_train(train_data, tagset, numepochs):
     feat_vec = defaultdict(int)
+    default_tag = tagset[0]
+    output =[];
     # insert your code here
     # please limit the number of iterations of training to n iterations
+    for i in range(10):
+        numOfError = 0;
+        for (labeled_list, feat_list) in train_data:
+            output = perc.perc_test(feat_vec, labeled_list, feat_list, tagset, default_tag)  
+            elements = [element.split(" ")[2] for element in labeled_list]
+            for j in range(len(elements)):
+                trueLabel = elements[j]
+                argMaxLabel = output[j]
+                if trueLabel != argMaxLabel:
+                    numOfError = numOfError + 1;
+                    for key in feat_list[j*20:j*20+19] :
+                        if key =="B":
+                            feat_vec[elements[j-1],trueLabel] = feat_vec[elements[j-1],trueLabel] + 1
+                            feat_vec[output[j-1],argMaxLabel] = feat_vec[output[j-1], argMaxLabel] - 1
+                        else :
+                            #print (key,trueLabel), "value ", 1
+                            feat_vec[key,trueLabel] =  feat_vec[key,trueLabel] + 1;
+                            feat_vec[key,argMaxLabel] = feat_vec[key,argMaxLabel] - 1;
+                            #print (key,argMaxLabel), "value ", -1                                         
+        print "Number of error in Epoch",i," ", numOfError
     return feat_vec
 
 if __name__ == '__main__':

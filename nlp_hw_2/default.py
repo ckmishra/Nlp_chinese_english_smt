@@ -32,6 +32,7 @@ import perc
 import sys, optparse, os
 from collections import defaultdict
 from _elementtree import Element
+from odo.backends.tests.test_sql import prec
 
 def perc_train(train_data, tagset, numepochs):
     feat_vec = defaultdict(int)
@@ -39,26 +40,50 @@ def perc_train(train_data, tagset, numepochs):
     output =[];
     # insert your code here
     # please limit the number of iterations of training to n iterations
-    for i in range(10):
+    for i in range(15):
         numOfError = 0;
         for (labeled_list, feat_list) in train_data:
             output = perc.perc_test(feat_vec, labeled_list, feat_list, tagset, default_tag)  
             elements = [element.split(" ")[2] for element in labeled_list]
             for j in range(len(elements)):
                 trueLabel = elements[j]
+                trueLabel_prev = elements[j-1];
                 argMaxLabel = output[j]
-                if trueLabel != argMaxLabel:
+                argMaxLabel_prev = output[j-1];
+                if (trueLabel != argMaxLabel) :
                     numOfError = numOfError + 1;
-                    for key in feat_list[j*20:j*20+19] :
-                        if key =="B":
-                            feat_vec[elements[j-1],trueLabel] = feat_vec[elements[j-1],trueLabel] + 1
-                            feat_vec[output[j-1],argMaxLabel] = feat_vec[output[j-1], argMaxLabel] - 1
+                    #(endindex,feats) = perc.feats_for_word(j,feat_list)
+                    for feat in feat_list[j*20:j*20+20] :
+                    #for feat in feats:
+                        if feat =="B":
+                            #print ("B:"+trueLabel_prev,trueLabel),1
+                            feat_vec["B:"+trueLabel_prev,trueLabel] = feat_vec["B:"+trueLabel_prev,trueLabel] + 1
+                            feat_vec["B:"+argMaxLabel_prev,argMaxLabel] = feat_vec["B:"+argMaxLabel_prev,argMaxLabel] - 1
+                            #print ("B:"+argMaxLabel_prev,argMaxLabel), -1
                         else :
-                            #print (key,trueLabel), "value ", 1
-                            feat_vec[key,trueLabel] =  feat_vec[key,trueLabel] + 1;
-                            feat_vec[key,argMaxLabel] = feat_vec[key,argMaxLabel] - 1;
-                            #print (key,argMaxLabel), "value ", -1                                         
-        print "Number of error in Epoch",i," ", numOfError
+                            #print (feat,trueLabel),1
+                            feat_vec[feat,trueLabel] =  feat_vec[feat,trueLabel] + 1;
+                            feat_vec[feat,argMaxLabel] = feat_vec[feat,argMaxLabel] - 1;
+                            #print (feat,argMaxLabel),-1
+                ''' 
+                elif(argMaxLabel_prev != trueLabel_prev):
+                    numOfError = numOfError + 1;
+
+                    #(endindex,feats) = perc.feats_for_word(j,feat_list)
+                    for feat in feat_list[j*20:j*20+20] :
+                    #for feat in feats:
+                        if feat =="B":
+                            #print ("B:"+trueLabel_prev,trueLabel),1
+                            feat_vec["B:"+trueLabel_prev,trueLabel] = feat_vec["B:"+trueLabel_prev,trueLabel] + 1
+                            feat_vec["B:"+argMaxLabel_prev,argMaxLabel] = feat_vec["B:"+argMaxLabel_prev,argMaxLabel] - 1
+                            #print ("B:"+argMaxLabel_prev,argMaxLabel), -1
+                        else :
+                            #print (feat,trueLabel),1
+                            feat_vec[feat,trueLabel] =  feat_vec[feat,trueLabel] + 1;
+                            feat_vec[feat,argMaxLabel] = feat_vec[feat,argMaxLabel] - 1;
+                            #print (feat,argMaxLabel),-1
+                   '''                                   
+        print "Number of error in Epoch", i+1," ", numOfError
     return feat_vec
 
 if __name__ == '__main__':

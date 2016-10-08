@@ -55,28 +55,31 @@ def perc_train(train_data, tagset, numepochs):
                 argMaxLabel_prev = output[j-1];
                 if (trueLabel != argMaxLabel) :
                     numOfError = numOfError + 1;
-                    #(endindex,feats) = perc.feats_for_word(j,feat_list)
                     for feat in feat_list[j*20:j*20+20] :
-                    #for feat in feats:
                         if feat =="B":
-                            #print ("B:"+trueLabel_prev,trueLabel),1
                             feat_vec["B:"+trueLabel_prev,trueLabel] = feat_vec["B:"+trueLabel_prev,trueLabel] + 1
                             feat_vec["B:"+argMaxLabel_prev,argMaxLabel] = feat_vec["B:"+argMaxLabel_prev,argMaxLabel] - 1
-                            #print ("B:"+argMaxLabel_prev,argMaxLabel), -1
                         else :
-                            #print (feat,trueLabel),1
                             feat_vec[feat,trueLabel] =  feat_vec[feat,trueLabel] + 1;
                             feat_vec[feat,argMaxLabel] = feat_vec[feat,argMaxLabel] - 1;
-                            #print (feat,argMaxLabel),-1
+                '''
+                elif ((trueLabel == argMaxLabel) & (trueLabel_prev != argMaxLabel_prev) & j > 0 ):
+                    # bigram
+                     numOfError = numOfError + 1;
+                     for feat in feat_list[j*20:j*20+20] :
+                            feat_vec["B:"+trueLabel_prev,trueLabel] = feat_vec["B:"+trueLabel_prev,trueLabel] + 1
+                            feat_vec["B:"+argMaxLabel_prev,argMaxLabel] = feat_vec["B:"+argMaxLabel_prev,argMaxLabel] - 1
+            '''
+            
             for key in feat_vec:                             
                 sigma[key] = sigma[key]  + feat_vec[key];     
-                          
+                         
         print "Number of error in Epoch", i+1," ", numOfError
-        
+    
     for key,value in sigma.items():
         gamma[key] = value/(numepochs*len(train_data))
-      
-    return gamma
+     
+    return feat_vec
 
 if __name__ == '__main__':
     optparser = optparse.OptionParser()

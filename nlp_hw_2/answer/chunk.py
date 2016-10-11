@@ -27,8 +27,9 @@ Inside the perceptron training loop:
     - If you are going word by word to check if the predicted tag is equal to the true tag, there is a corner case where the bigram 'T_{i-1} T_i' is incorrect even though T_i is correct.
 
 """
+from collections import Counter   
 import sys, optparse, os
-
+from datetime import datetime
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
@@ -36,50 +37,68 @@ import perc
 from collections import defaultdict
 
 def perc_train(train_data, tagset, numepochs):
+    starttime = datetime.now()
     feat_vec = defaultdict(int)
     default_tag = tagset[0]
-    output =[];
     sigma = defaultdict(int)
     gamma = defaultdict(int)
     # insert your code here
     # please limit the number of iterations of training to n iterations
     for i in range(numepochs):
+        epochstarttime = datetime.now()
         numOfError = 0;
+        argMaxoutput = [];
         for (labeled_list, feat_list) in train_data:
-            output = perc.perc_test(feat_vec, labeled_list, feat_list, tagset, default_tag)  
-            elements = [element.split(" ")[2] for element in labeled_list]
-            for j in range(len(elements)):
-                trueLabel = elements[j]
-                trueLabel_prev = elements[j-1];
-                argMaxLabel = output[j]
-                argMaxLabel_prev = output[j-1];
+            argMaxoutput = perc.perc_test(feat_vec, labeled_list, feat_list, tagset, default_tag)  
+            expectedOutput = [element.split(" ")[2] for element in labeled_list]
+            for j in range(len(expectedOutput)):
+                trueLabel = expectedOutput[j]
+                argMaxLabel = argMaxoutput[j]
+                trueLabel_prev = expectedOutput[j-1];
+                argMaxLabel_prev = argMaxoutput[j-1];
                 if (trueLabel != argMaxLabel) :
                     numOfError = numOfError + 1;
                     for feat in feat_list[j*20:j*20+20] :
-                        if feat =="B":
+                        if (feat =="B") & (j > 0):
+                            trueLabel_prev = expectedOutput[j-1];
+                            argMaxLabel_prev = argMaxoutput[j-1];                  
                             feat_vec["B:"+trueLabel_prev,trueLabel] = feat_vec["B:"+trueLabel_prev,trueLabel] + 1
                             feat_vec["B:"+argMaxLabel_prev,argMaxLabel] = feat_vec["B:"+argMaxLabel_prev,argMaxLabel] - 1
+                            #sigma["B:"+trueLabel_prev,trueLabel] = sigma["B:"+ trueLabel_prev,trueLabel] + feat_vec["B:"+ trueLabel_prev,trueLabel]
+                            #sigma["B:"+argMaxLabel_prev,argMaxLabel] = sigma["B:"+argMaxLabel_prev,argMaxLabel] + feat_vec["B:"+argMaxLabel_prev,argMaxLabel]
                         else :
                             feat_vec[feat,trueLabel] =  feat_vec[feat,trueLabel] + 1;
                             feat_vec[feat,argMaxLabel] = feat_vec[feat,argMaxLabel] - 1;
+                            #sigma[feat,trueLabel] =  sigma[feat,trueLabel] + feat_vec[feat,trueLabel];
+                            #sigma[feat,argMaxLabel] = sigma[feat,argMaxLabel] + feat_vec[feat,argMaxLabel];
+                
+                elif (j > 0) & (trueLabel == argMaxLabel) & (trueLabel_prev != argMaxLabel_prev):
+                        feat_vec["B:"+trueLabel_prev,trueLabel] = feat_vec["B:"+ trueLabel_prev,trueLabel] + 1
+                        feat_vec["B:"+argMaxLabel_prev,argMaxLabel] = feat_vec["B:"+argMaxLabel_prev,argMaxLabel] - 1
+                        #sigma["B:"+trueLabel_prev,trueLabel] = sigma["B:"+ trueLabel_prev,trueLabel] + feat_vec["B:"+ trueLabel_prev,trueLabel]
+                        #sigma["B:"+argMaxLabel_prev,argMaxLabel] = sigma["B:"+argMaxLabel_prev,argMaxLabel] + feat_vec["B:"+argMaxLabel_prev,argMaxLabel]
                 '''
-                elif ((trueLabel == argMaxLabel) & (trueLabel_prev != argMaxLabel_prev) & j > 0 ):
-                    # bigram
-                     numOfError = numOfError + 1;
-                     for feat in feat_list[j*20:j*20+20] :
-                            feat_vec["B:"+trueLabel_prev,trueLabel] = feat_vec["B:"+trueLabel_prev,trueLabel] + 1
-                            feat_vec["B:"+argMaxLabel_prev,argMaxLabel] = feat_vec["B:"+argMaxLabel_prev,argMaxLabel] - 1
-            '''
+                elif (j > 1) & (trueLabel == argMaxLabel) & (trueLabel_prev == argMaxLabel_prev) & (expectedOutput[j-2] == argMaxoutput[j-2]):
+                        feat_vec["B:"+expectedOutput[j-2],trueLabel_prev,trueLabel] = feat_vec["B:"+ expectedOutput[j-2],trueLabel_prev,trueLabel] + 1
+                        feat_vec["B:"+argMaxLabel_prev,argMaxLabel] = feat_vec["B:"+argMaxoutput[j-2],argMaxLabel_prev,argMaxLabel] - 1
+                        #sigma["B:"+trueLabel_prev,trueLabel] = sigma["B:"+ trueLabel_prev,trueLabel] + feat_vec["B:"+ trueLabel_prev,trueLabel]
+                        #sigma["B:"+argMaxLabel_prev,argMaxLabel] = sigma["B:"+argMaxLabel_prev,argMaxLabel] + feat_vec["B:"+argMaxLabel_prev,argMaxLabel]
+                '''
+            #sigma = dict(Counter(sigma)+Counter(feat_vec))
             
             for key in feat_vec:                             
-                sigma[key] = sigma[key]  + feat_vec[key];     
-                         
-        print "Number of error in Epoch", i+1," ", numOfError
+                sigma[key] = sigma[key]  + feat_vec[key];
+            
+        epochendtime = datetime.now()
+        print "Number of error in Epoch", i+1," ", numOfError," Time Taken:", epochendtime-epochstarttime  
     
     for key,value in sigma.items():
         gamma[key] = value/(numepochs*len(train_data))
-     
-    return feat_vec
+        #gamma[key] = value/(numepochs)
+
+    endtime = datetime.now()
+    print "Total Time taken to train:", endtime-starttime
+    return gamma
 
 if __name__ == '__main__':
     optparser = optparse.OptionParser()
@@ -87,7 +106,7 @@ if __name__ == '__main__':
     optparser.add_option("-i", "--trainfile", dest="trainfile", default=os.path.join("../data", "train.txt.gz"), help="input data, i.e. the x in \phi(x,y)")
     optparser.add_option("-f", "--featfile", dest="featfile", default=os.path.join("../data", "train.feats.gz"), help="precomputed features for the input data, i.e. the values of \phi(x,_) without y")
     optparser.add_option("-e", "--numepochs", dest="numepochs", default=int(15), help="number of epochs of training; in each epoch we iterate over over all the training examples")
-    optparser.add_option("-m", "--modelfile", dest="modelfile", default=os.path.join("../data", "default.model"), help="weights for all features stored on disk")
+    optparser.add_option("-m", "--modelfile", dest="modelfile", default=os.path.join("../data", "test.model"), help="weights for all features stored on disk")
     (opts, _) = optparser.parse_args()
 
     # each element in the feat_vec dictionary is:

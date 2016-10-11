@@ -36,53 +36,40 @@ from odo.backends.tests.test_sql import prec
 
 def perc_train(train_data, tagset, numepochs):
     feat_vec = defaultdict(int)
-    default_tag = tagset[0]
-    output =[];
-    sigma = defaultdict(int)
-    gamma = defaultdict(int)
+    default_tag = tagset[0] 
+    
     # insert your code here
     # please limit the number of iterations of training to n iterations
     for i in range(numepochs):
         numOfError = 0;
+        output = [];
         for (labeled_list, feat_list) in train_data:
             output = perc.perc_test(feat_vec, labeled_list, feat_list, tagset, default_tag)  
             elements = [element.split(" ")[2] for element in labeled_list]
             for j in range(len(elements)):
                 trueLabel = elements[j]
-                trueLabel_prev = elements[j-1];
                 argMaxLabel = output[j]
-                argMaxLabel_prev = output[j-1];
                 if (trueLabel != argMaxLabel) :
                     numOfError = numOfError + 1;
-                    #(endindex,feats) = perc.feats_for_word(j,feat_list)
                     for feat in feat_list[j*20:j*20+20] :
-                    #for feat in feats:
-                        if feat =="B":
-                            #print ("B:"+trueLabel_prev,trueLabel),1
+                        if (feat =="B") & j > 0 :
+                            trueLabel_prev = elements[j-1];
+                            argMaxLabel_prev = output[j-1];
                             feat_vec["B:"+trueLabel_prev,trueLabel] = feat_vec["B:"+trueLabel_prev,trueLabel] + 1
                             feat_vec["B:"+argMaxLabel_prev,argMaxLabel] = feat_vec["B:"+argMaxLabel_prev,argMaxLabel] - 1
-                            #print ("B:"+argMaxLabel_prev,argMaxLabel), -1
                         else :
-                            #print (feat,trueLabel),1
                             feat_vec[feat,trueLabel] =  feat_vec[feat,trueLabel] + 1;
                             feat_vec[feat,argMaxLabel] = feat_vec[feat,argMaxLabel] - 1;
-                            #print (feat,argMaxLabel),-1
-            for key in feat_vec:                             
-                sigma[key] = sigma[key]  + feat_vec[key];     
-                          
+
         print "Number of error in Epoch", i+1," ", numOfError
-        
-    for key,value in sigma.items():
-        gamma[key] = value/(numepochs*len(train_data))
-      
-    return gamma
+    return feat_vec
 
 if __name__ == '__main__':
     optparser = optparse.OptionParser()
     optparser.add_option("-t", "--tagsetfile", dest="tagsetfile", default=os.path.join("data", "tagset.txt"), help="tagset that contains all the labels produced in the output, i.e. the y in \phi(x,y)")
     optparser.add_option("-i", "--trainfile", dest="trainfile", default=os.path.join("data", "train.txt.gz"), help="input data, i.e. the x in \phi(x,y)")
     optparser.add_option("-f", "--featfile", dest="featfile", default=os.path.join("data", "train.feats.gz"), help="precomputed features for the input data, i.e. the values of \phi(x,_) without y")
-    optparser.add_option("-e", "--numepochs", dest="numepochs", default=int(12), help="number of epochs of training; in each epoch we iterate over over all the training examples")
+    optparser.add_option("-e", "--numepochs", dest="numepochs", default=int(15), help="number of epochs of training; in each epoch we iterate over over all the training examples")
     optparser.add_option("-m", "--modelfile", dest="modelfile", default=os.path.join("data", "default.model"), help="weights for all features stored on disk")
     (opts, _) = optparser.parse_args()
 

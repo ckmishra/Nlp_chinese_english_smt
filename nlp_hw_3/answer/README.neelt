@@ -1,0 +1,3 @@
+Implemented baseline. 
+Tried with different initilization value in EM method to get optimal AER.
+Worked on advanced method such as HMM model.

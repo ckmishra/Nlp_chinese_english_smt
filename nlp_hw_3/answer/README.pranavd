@@ -1,0 +1,3 @@
+Implemnted baseline.
+Implemented bidirectional model p(f/e) and p(e/f). 
+Figured out best n for add n method i.e 0.006.

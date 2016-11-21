@@ -1,3 +1,4 @@
 Implemnted baseline.
 Implemented bidirectional model p(f/e) and p(e/f). 
-Figured out best n for add n method i.e 0.006.
+Handled rare words in source language, not to act as garbage collectors using n add method.
+Figured out best n for add n method.

@@ -45,7 +45,6 @@ for n,line in enumerate(open(opts.nbest)):
     nbests.append([])
   features = [float(h) for h in features.strip().split()]
   align_feature = [float(h) for h in align_features[n].strip().split()]
-  features = features  + align_feature
   wc_feat = [float(h) for h in wc_features[n].strip().split()]
   features = features + wc_feat + align_feature
 

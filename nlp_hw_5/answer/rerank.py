@@ -4,11 +4,23 @@ from collections import namedtuple
 
 optparser = optparse.OptionParser()
 optparser.add_option("-n", "--nbest", dest="nbest", default=os.path.join("../data", "test.nbest"), help="N-best file")
+optparser.add_option("-r", "--test_en", dest="test_en", default=os.path.join("../data", "test.en"), help="English reference sentences")
+optparser.add_option("-f", "--test_fr", dest="test_fr", default=os.path.join("../data", "test.fr"), help="French Training data")
 optparser.add_option("-w", "--weight-file", dest="weights", default=None, help="Weight filename, or - for stdin (default=use uniform weights)")
-optparser.add_option("-e", "--extra_feature", dest="extra_feature", default=os.path.join("./", "test.feature"), help="Extra Feature")
+optparser.add_option("--af", "--align_score_feature", dest="align_score_feature", default=os.path.join("./", "align.train.feat"), help="Alignment score Feature")
 
 (opts, _) = optparser.parse_args()
 
+def is_ascii(s):
+    return all(ord(c) < 128 for c in s)
+def create_extra_feature(nbest, src, target):
+    for n, line in enumerate(open(opts.nbest)):
+        (i, sentence, features) = line.strip().split("|||")    
+        translated_len_feat = len(sentence.strip().split())
+        untranslated_feat = [word for word in sentence.strip().split() if not(is_ascii(word))] 
+        yield str(math.log10(len(untranslated_feat)+1))
+        #yield  str((math.log10(translated_len_feat))) +" "+ str((len(untranslated_feat)+1))
+        #yield str(translated_len_feat)+" "+ str(translated_len_feat - len(src) )
 w = None
 if opts.weights is not None:
   weights_file = sys.stdin if opts.weights is "-" else open(opts.weights)
@@ -18,18 +30,25 @@ if opts.weights is not None:
 
 translation = namedtuple("translation", "english, score")
 nbests = []
-
-extra_features = []
-for n,line in enumerate(open(opts.extra_feature)):
-    extra_features.append(line.strip().split("|||")[1])
+# alignment score feature
+align_features = []
+for n, feat in enumerate(open(opts.align_score_feature)):
+    align_features.append(feat)
+# wc specific feature    
+wc_features = []
+for n, feat in enumerate(create_extra_feature(opts.nbest,opts.test_fr,opts.test_en)):
+    wc_features.append(feat)
 
 for n,line in enumerate(open(opts.nbest)):
   (i, sentence, features) = line.strip().split("|||")
   if len(nbests) <= int(i):
     nbests.append([])
   features = [float(h) for h in features.strip().split()]
-  new_feature = [float(h) for h in extra_features[n].strip().split()]
-  features = features + new_feature
+  align_feature = [float(h) for h in align_features[n].strip().split()]
+  features = features  + align_feature
+  wc_feat = [float(h) for h in wc_features[n].strip().split()]
+  features = features + wc_feat + align_feature
+
   if w is None or len(w) != len(features):
     w = [1.0/len(features) for _ in xrange(len(features))]
   nbests[int(i)].append(translation(sentence.strip(), sum([x*y for x,y in zip(w, features)])))

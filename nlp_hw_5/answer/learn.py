@@ -107,7 +107,6 @@ if __name__ == '__main__':
         (i, sentence, features) = line.strip().split("|||")
         features = [float(h) for h in features.strip().split()]
         align_feature = [float(h) for h in align_features[n].strip().split()]
-        features = features + align_feature
         wc_feature = [float(h) for h in wc_features[n].strip().split()]
         features = features + wc_feature +align_feature
         (i, sentence) = (int(i), sentence.strip())

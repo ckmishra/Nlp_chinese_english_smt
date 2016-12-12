@@ -1,0 +1,85 @@
+0 ||| 14 to the english the third the second sha 伊 女皇 伯 陛下 登基 世 利 years are  ||| -81.92161803 -3.019994377 -8.981024005 -2.43631601 -9.258541 -33.88322
+0 ||| 14 to the english the third the second sha 利 伊 伯 世 登基 years are 陛下 女皇  ||| -81.92161803 -2.88272190532 -8.981024005 -2.43631601 -9.258541 -33.88322
+0 ||| 14 to the english the third the second sha 伊 女皇 伯 陛下 登基 世 利 years of  ||| -80.6727822 -3.019994377 -8.287874005 -1.743269015 -9.258541 -32.76411
+0 ||| 14 to the english the third the second sha 伊 女皇 伯 陛下 登基 世 利 year of  ||| -81.3106325 -3.019994377 -8.981024005 -1.743269015 -10.565221 -34.18776
+0 ||| 14 to the english the third the second sha 伊 女皇 伯 陛下 登基 世 利 years  ||| -79.4487898 -3.019994377 -5.802972005 -2.55409901 -9.258541 -32.01378
+0 ||| 14 to the english the third the second sha 伊 女皇 伯 陛下 登基 世 利 year  ||| -79.4827662 -3.019994377 -6.416074005 -2.67472701 -10.565221 -33.43743
+1 ||| effect from known in council be of hong kong which opened on 30 debate on kong legislative within a development session of report of proceedings october of a in been nine the  ||| -116.50696771 -3.79787171654 -31.732239005 -13.042260035 -32.895595 -81.163868
+1 ||| effect from known in council be of hong kong which opened on 30 debate on kong legislative within a development session of report of proceedings october of a in been nine of the  ||| -116.72347821 -3.79787171654 -33.170899005 -12.520360035 -33.082495 -82.054738
+1 ||| effect from known in council be of hong kong which opened on 30 debate on kong legislative within a development report of proceedings session of of the october of a of the 1985  ||| -116.80487701 -3.43181179205 -31.612752005 -5.809840035 -26.980815 -76.258528
+1 ||| effect from known in council be of hong kong which opened on 30 debate on kong legislative within a development session of report of proceedings october of a in been nine of  ||| -116.25711841 -3.79787171654 -31.677629005 -12.037485035 -33.082495 -80.600772
+1 ||| effect from known in council be of hong kong which opened on 30 debate on kong legislative within a development session of of the october of the 1985 of a report of proceedings  ||| -115.60765251 -3.66059924485 -31.612752005 -5.809840035 -26.980815 -76.258528
+1 ||| effect from known in council be of hong kong which opened on 30 debate on kong legislative within a development session of report of proceedings october of a in been nine in  ||| -116.57691961 -3.79787171654 -33.260849005 -13.617050035 -34.750385 -81.703378
+1 ||| effect from known in council be of hong kong which opened on 30 debate on kong legislative within a development session of report of proceedings october of a of the 1985 of  ||| -115.19601801 -3.61484175429 -30.119482005 -5.326965035 -26.980815 -74.804562
+1 ||| effect from known in council be of hong kong which opened on 30 debate on kong legislative within a development session of report of proceedings october of a in 9 of  ||| -112.40232454 -3.79787171654 -30.579019005 -13.82914503 -32.737055 -79.764212
+1 ||| effect from known in council be of hong kong which opened on 30 debate on kong legislative within a development session of report of proceedings october of a in 9 in  ||| -112.57613181 -3.79787171654 -32.162239005 -15.40871003 -34.404945 -80.866818
+1 ||| effect from known in council be of hong kong which opened on 30 debate on kong legislative within a development report of proceedings session of of the october of a 1985 be  ||| -116.02259331 -3.43181179205 -30.919602005 -5.809840035 -27.987965 -70.635428
+2 ||| council until kong legislative council be chamber  ||| -35.7748104 -0.274544943364 -9.650300005 -3.806764005 -5.24016 -12.02239
+2 ||| kong legislative council until council the chamber  ||| -34.2297252 -0.183029962243 -11.036600005 -3.58372001 -5.24016 -11.5951
+2 ||| chamber hong kong legislative council  ||| -28.7152565 -0.320302433925 -1.178750005 -1.791860005 -5.24017 -8.38926
+3 ||| of a on 30 in been nine wednesday , october  ||| -39.379307 -0.640604867849 -9.883067005 -9.739342015 -10.3292384 -24.205808
+3 ||| of a on 30 in been nine october wednesday ,  ||| -39.0896631 -0.457574905607 -9.883067005 -9.739342015 -10.3292384 -24.205808
+3 ||| of a on 30 in october wednesday , been nine  ||| -38.968286218 -0.549089886728 -9.883067005 -9.739342015 -10.3292384 -24.205808
+3 ||| wednesday , october on 30 of the 1985 of a  ||| -37.70070133 -0.68636235841 -8.324920005 -3.028822015 -4.2275584 -18.409598
+3 ||| wednesday , october on 30 of the 1985 a  ||| -36.29802583 -0.68636235841 -5.779388005 -2.613822015 -4.2275584 -17.659268
+3 ||| of a on 30 in october wednesday , 9  ||| -34.11688994 -0.549089886728 -8.784457005 -11.53100201 -9.9837984 -23.369248
+3 ||| of a on 30 in october wednesday , nine  ||| -35.12220083 -0.549089886728 -8.496767005 -10.29885801 -10.3292384 -22.611428
+3 ||| wednesday , october on 30 of the 1985 by one  ||| -38.80084463 -0.68636235841 -9.711210005 -0.28808202 -5.4221484 -18.207028
+3 ||| wednesday , october on 30 of the 1985 one  ||| -36.77826973 -0.68636235841 -7.919450005 -2.324862015 -5.4221484 -16.565708
+3 ||| wednesday , on 30 october 1985 in the  ||| -33.202433 -0.503332396167 -2.39789 -0.00020001 -8.0787134 -19.85882
+4 ||| 4 o council met at four minutes to five o &apos;clock are very  ||| -59.74673956 -0.366059924485 -10.09377 -2.890670015 -14.81168 -39.373758
+4 ||| 4 o council met at four minutes to five o &apos;clock very  ||| -58.14642116 -0.366059924485 -10.09377 -6.25787001 -14.2437 -33.103908
+4 ||| 4 o council met at four minutes to five o &apos;clock can fully  ||| -61.39339266 -0.366059924485 -10.09377 -2.890670015 -17.07904 -36.436258
+4 ||| 4 o council met at four minutes to five o &apos;clock fully  ||| -58.70341466 -0.366059924485 -10.09377 -5.37548001 -17.07904 -34.347678
+4 ||| 4 o council met at four minutes to five o &apos;clock quite  ||| -58.51793316 -0.366059924485 -10.09377 -4.83648001 -17.42645 -34.442908
+4 ||| council met at start 4 o are very four council until  ||| -50.681121 -0.549089886728 -14.40792 -4.431118015 -11.20944 -32.248468
+4 ||| council met at start 4 o are very council until four  ||| -50.681121 -0.594847377289 -14.40792 -4.431118015 -11.20944 -32.248468
+4 ||| council met at start 4 o are very four meeting  ||| -45.5335017 -0.549089886728 -14.40792 -4.836578015 -11.02668 -28.186805
+4 ||| council met at minutes to five o &apos;clock twenty minutes to  ||| -50.20753852 -0.366059924485 -5.66295 -2.197320005 -23.12213 -33.70338
+4 ||| council met at minutes to five o &apos;clock twenty minutes  ||| -48.29954296 -0.366059924485 -5.66295 -2.197320005 -23.12213 -32.6074
+5 ||| of study : - those appear before  ||| -27.83083724 -0.274544943364 -6.78219 -3.80686001 -8.940613 -19.92943
+5 ||| appear before those of study : -  ||| -24.38166184 0.0 -6.78219 -3.80686001 -8.940613 -19.92943
+5 ||| of study : - those present  ||| -21.72838933 -0.274544943364 -6.78219 -7.303270005 -6.429143 -13.93574
+5 ||| of study : - those sit  ||| -23.25759694 -0.274544943364 -6.78219 -4.499907005 -11.042143 -16.06321
+5 ||| appear before those :  ||| -15.72816195 0.0 -3.73767 -5.010730005 -8.255493 -12.922059
+5 ||| appear before penalty :  ||| -17.2185619 0.0 -3.73767 -3.283510005 -11.132323 -13.720709
+5 ||| appear before those -  ||| -16.03997055 0.0 -4.58496 -5.323110005 -13.07655 -15.62943
+5 ||| appear before penalty for -  ||| -19.12029703 0.0 -4.58496 -2.209597005 -15.95338 -17.61944
+5 ||| penalty for present -  ||| -14.19764773 -0.183029962243 -4.58496 -5.706007 -13.44191 -11.62575
+5 ||| present  ||| -7.9751902 0.0 -0.000100005 -1.88707 -13.16 -3.33631
+6 ||| of hong kong excellency the governor sir roger of a chairman particular ( the following m.b.e. , the 德 g.c.m.g. , the ) what  ||| -95.25710584 -1.64726966018 -28.129110015 -13.21449101 -12.33347452 -34.73247465
+6 ||| of hong kong excellency the governor sir roger of a chairman particular ( the following m.b.e. , the 德 g.c.m.g. ) what , the  ||| -95.18614973 -1.92181460355 -28.129110015 -13.21449101 -12.33347452 -34.73247465
+6 ||| of hong kong excellency the governor sir roger of a chairman particular ( the following m.b.e. , the 德 g.c.m.g. , the ) of  ||| -94.8790987 -1.64726966018 -28.129110015 -14.22609401 -12.33347452 -33.64324665
+6 ||| of hong kong excellency the governor sir roger of a chairman particular ( the following m.b.e. , the 德 g.c.m.g. ) what , of  ||| -96.02192183 -1.92181460355 -29.777770015 -11.95443301 -12.33347452 -34.21975465
+6 ||| of hong kong excellency the governor sir roger of a chairman particular ( the following m.b.e. , the 德 g.c.m.g. , the ) to  ||| -94.9973917 -1.64726966018 -28.822260015 -13.21449101 -12.33347452 -33.98887465
+6 ||| of hong kong excellency the governor sir roger of a chairman particular ( the following m.b.e. , the 德 g.c.m.g. , the ) in  ||| -94.978362031 -1.64726966018 -28.822260015 -12.521444015 -12.33347452 -34.49982465
+6 ||| of hong kong excellency the governor sir roger of a chairman particular ( the following m.b.e. , the 德 g.c.m.g. ) what ,  ||| -93.41249273 -1.92181460355 -24.135863015 -12.13999901 -12.33347452 -33.46941965
+6 ||| of hong kong excellency the governor sir roger of a chairman particular ( the following m.b.e. , the 德 g.c.m.g. ) what to  ||| -94.11788264 -1.92181460355 -25.865750015 -13.26995101 -13.97547052 -34.79475465
+6 ||| of hong kong excellency the governor sir roger of a chairman particular ( the following m.b.e. , the 德 g.c.m.g. ) what that  ||| -93.68523322 -1.92181460355 -26.558890015 -12.82433101 -14.41978052 -34.29634465
+6 ||| of hong kong excellency the governor sir roger of a chairman particular ( the following m.b.e. , the 德 g.c.m.g. , the )  ||| -90.5234599 -1.64726966018 -23.651775015 -12.86428901 -12.33347452 -32.89291365
+7 ||| sir roger sir j.p. secretary for district administration members of secretary sir the honourable the chief , the 杰 逸 k.b.e. , the c.m.g. , the  ||| -105.18708363 -2.24211703747 -29.21499701 -13.68560502 -16.41853818 -49.34522063
+7 ||| sir roger sir j.p. secretary for district administration members of secretary sir the honourable the chief , the 杰 逸 k.b.e. , the c.m.g. , of  ||| -106.02285573 -2.24211703747 -30.86365701 -12.42554702 -16.41853818 -48.83250063
+7 ||| sir roger sir j.p. secretary for district administration members of secretary sir the honourable the chief , the 杰 逸 k.b.e. , the c.m.g. ,  ||| -103.41342663 -2.24211703747 -25.22175001 -12.61111302 -16.41853818 -48.08216563
+7 ||| sir roger sir j.p. secretary for district administration members of secretary sir the honourable the chief , the 杰 逸 k.b.e. , the c.m.g. to  ||| -103.91126163 -2.24211703747 -26.95163701 -13.74106502 -18.06053418 -49.40750063
+7 ||| sir roger sir j.p. secretary for district administration members of secretary sir the honourable the chief 逸 杰 k.b.e. , the c.m.g. , of ,  ||| -104.27276114 -2.05908707523 -26.87041001 -11.35105502 -16.41853818 -47.56944563
+7 ||| sir roger sir j.p. secretary for district administration members of secretary sir the honourable the chief 逸 杰 k.b.e. , the c.m.g. , of to  ||| -104.78831697 -2.05908707523 -28.60029701 -12.48100702 -18.06053418 -48.89478063
+7 ||| sir roger sir j.p. secretary for district administration members of secretary sir the honourable the chief , the 杰 逸 k.b.e. , the c.m.g. that  ||| -103.99921223 -2.24211703747 -27.64477701 -13.29544502 -18.50484418 -48.90909063
+7 ||| sir roger sir j.p. secretary for district administration members of secretary sir the honourable the chief 逸 杰 k.b.e. , the c.m.g. , of that  ||| -104.32783913 -2.05908707523 -29.29343701 -12.03538702 -18.50484418 -48.39637063
+7 ||| sir roger sir j.p. secretary for district administration members of secretary sir the honourable the chief , the 杰 逸 k.b.e. c.m.g. , to  ||| -101.67046603 -2.42514699972 -22.95839001 -12.66657302 -18.06053418 -48.14444563
+7 ||| sir roger sir j.p. secretary for district administration members of secretary sir the honourable the chief , the 杰 逸 k.b.e. c.m.g. , that  ||| -101.86176393 -2.42514699972 -23.65153001 -12.22095302 -18.50484418 -47.64603563
+8 ||| sir roger the administration of j.p. secretary for district administration the honourable pang the honourable the financial secretary sir 励 , the k.b.e. , the  ||| -103.48393702 -1.5099971885 -19.180497005 -7.043937015 -11.802357175 -47.63111611
+8 ||| sir roger the administration of j.p. secretary for district administration the honourable pang the honourable the financial secretary sir 励 , the k.b.e. , of  ||| -104.31970912 -1.5099971885 -20.829157005 -5.783879015 -11.802357175 -47.11839611
+8 ||| sir roger the administration of j.p. secretary for district administration the honourable pang the honourable the financial secretary sir 励 , of . k.b.e.  ||| -105.12272872 -1.46423969794 -18.377727 -4.341499015 -13.49498317 -47.38256
+8 ||| sir roger the administration of j.p. secretary for district administration the honourable pang the honourable the financial secretary sir 励 , the k.b.e. ,  ||| -101.71028002 -1.5099971885 -15.187250005 -5.969445015 -11.802357175 -46.36806111
+8 ||| sir roger the administration of j.p. secretary for district administration the honourable pang the honourable the financial secretary sir 励 , the k.b.e. to  ||| -102.20811502 -1.5099971885 -16.917137005 -7.099397015 -13.444353175 -47.69339611
+8 ||| sir roger the administration of j.p. secretary for district administration the honourable pang the honourable the financial secretary sir 励 k.b.e. , of ,  ||| -102.56961453 -1.41848220738 -16.835910005 -4.709387015 -11.802357175 -45.85534111
+8 ||| sir roger the administration of j.p. secretary for district administration the honourable pang the honourable the financial secretary sir 励 k.b.e. , of to  ||| -103.08517036 -1.41848220738 -18.565797005 -5.839339015 -13.444353175 -47.18067611
+8 ||| sir roger the administration of j.p. secretary for district administration the honourable pang the honourable the financial secretary sir 励 , the k.b.e. that  ||| -102.29606562 -1.5099971885 -17.610277005 -6.653777015 -13.888663175 -47.19498611
+8 ||| sir roger the administration of j.p. secretary for district administration the honourable pang the honourable the financial secretary sir 励 k.b.e. , of that  ||| -102.62469252 -1.41848220738 -19.258937005 -5.393719015 -13.888663175 -46.68226611
+8 ||| sir roger the administration of j.p. secretary for district administration the honourable pang the honourable the financial secretary sir 励 k.b.e. to ,  ||| -100.45964982 -1.41848220738 -12.923890005 -6.024905015 -13.444353175 -46.43034111
+9 ||| tong he the government secretary sir members of , the , the c.m.g. 明治 q.c.  ||| -57.98625651 -1.00666479233 -16.31810002 -14.86341501 -15.888540005 -26.86025662
+9 ||| tong he the government secretary sir members of , the 明治 c.m.g. q.c. , the  ||| -57.98147111 -1.0524222829 -16.31810002 -14.86341501 -15.888540005 -26.86025662
+9 ||| tong he the government secretary sir members of , the 明治 c.m.g. q.c. , of  ||| -58.81724321 -1.0524222829 -17.96676002 -13.60335701 -15.888540005 -26.34753662
+9 ||| tong he the government secretary sir members of , the 明治 c.m.g. q.c. ,  ||| -56.20781411 -1.0524222829 -12.32485302 -13.78892301 -15.888540005 -25.59720162
+9 ||| tong he the government secretary sir members of , the 明治 c.m.g. q.c. to  ||| -56.70564911 -1.0524222829 -14.05474002 -14.91887501 -17.530536005 -26.92253662
+9 ||| tong he the government secretary sir members of , the 明治 c.m.g. q.c. that  ||| -56.79359971 -1.0524222829 -14.74788002 -14.47325501 -17.974846005 -26.42412662

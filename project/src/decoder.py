@@ -19,6 +19,7 @@ def extract_english(h):
 
 def extract_tm_logprob(h):
     return 0.0 if h.predecessor is None else h.phrase.logprob + extract_tm_logprob(h.predecessor)
+
 '''
 def extract_lm_logprob(h):
     return 0.0 if h.predecessor is None else h.lm_logprob + extract_lm_logprob(h.predecessor)
@@ -41,19 +42,19 @@ def extract_tm_lex_pef(h):
 
 
 # Checking is hypothesis valid 
-def isDistrotionAllowed(coverage,distortion):
-    prefix_one_bit=0;
+def isValidDistrotion(coverage,distortion):
+    prefix_one_bit=0; # counting number of 1 before first zero
     for i in coverage:
         if i==0:
             break;
         prefix_one_bit += 1
     
-    last_one_bit=0;
+    last_one_bit=0; # getting index of last 1
     for i,j in enumerate(coverage):
         if j==1:
             last_one_bit = i;
     
-    if(last_one_bit - prefix_one_bit) <= distortion:
+    if(last_one_bit - prefix_one_bit) <= distortion:# if condition true then allow
         return True
 
     return False
@@ -62,7 +63,7 @@ def isDistrotionAllowed(coverage,distortion):
 def handle_unk_words(french, tm):
     for word in set(sum(french,())):
         if (word,) not in tm:
-            tm[(word,)] = [models.phrase(word, [0.0,0.0,0.0,0.0],0.0)]
+            tm[(word,)] = [models.phrase(word, [0.0,0.0,0.0,0.0], 0.0)]
 
 def get_all_phrases(h, f, tm, f_len, distortion_limit):
     all_phrases = []
@@ -148,8 +149,9 @@ def decode(french, tm, lm, ibm_model, stack_max, distortion_limit, distortion_pe
                     covered = coverage.count(1)
                     
                     for phrase in entry.phrases:
-                        #if not isDistrotionAllowed(coverage,distortion_limit):# if distortion limit allowed
-                        #    continue
+                        if distortion_limit != -1 and not isValidDistrotion(coverage, distortion_limit): 
+                            # if distortion limit -1 then no limit on distortion
+                                continue
                         # translation model
                         tm_logProbs = [feat*weight for (feat,weight) in zip(phrase.features, weights[2:6])]
                         tm_logProb = sum(tm_logProbs)
@@ -164,12 +166,12 @@ def decode(french, tm, lm, ibm_model, stack_max, distortion_limit, distortion_pe
                         lm_logprob += (lm.end(lm_state)) if covered == f_len else 0.0 
                         logprob += weights[0]*lm_logprob;
                 
-                        # language model
+                        # IBM 1 model score
                         align_logProb = 0.0;
                         for f_i in f[entry.start:entry.end]:
                             score = 0
                             for e_j in phrase.english.split():
-                                score+= ibm_model.get((f_i,e_j), 1/float(1000000))
+                                score+= ibm_model.get((f_i,e_j), 1/float(1000000))#if not found then smoothing
                             align_logProb +=  math.log10(score) 
                         logprob += weights[6]*align_logProb;
                 
@@ -279,7 +281,7 @@ if __name__ == '__main__':
             os.remove(opts.nbest)
         weights = [1/float(feat_len) for _ in xrange(feat_len)]    #Uniform
 
-        for epoch in range(5):# 5 epoch or 
+        for epoch in range(2):# 2 epoch or 
             
             nbest=decode(french, tm, lm, ibm_model, opts.s, opts.d, opts.p, opts.verbose, opts.b, weights, opts.nbest_value)
             sys.stderr.write("Decoding done for epoch %d...\n" % epoch)
@@ -297,7 +299,7 @@ if __name__ == '__main__':
                learned.write(weights); 
             weights = [float(line.strip()) for line in open(opts.learned)]
             
-            sys.stderr.write("Learning completed for epoch %s...\n" % weights)
+            sys.stderr.write("Learning completed for epoch %d, and weights are %s...\n" % (epoch,weights))
             
     else : 
         # if decoder than

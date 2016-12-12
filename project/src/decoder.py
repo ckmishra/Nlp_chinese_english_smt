@@ -182,10 +182,10 @@ def decode(french, tm, lm, ibm_model, stack_max, distortion_limit, distortion_pe
                         logprob_with_fc = future_cost + (weights[1] * penalty) + logprob  # updated logprob
                         
                         features = [lm_logprob, penalty] + phrase.features +[align_logProb] # hypothesis features
-                        print features
-                        print h.features
+                        #print features
+                        #print h.features
                         hyp_features = [x+y for (x,y) in zip(features,h.features)]
-                        print hyp_features
+                        #print hyp_features
 
                         
                         new_hypothesis = hypothesis(logprob, lm_state, h, phrase, coverage, entry.end, logprob_with_fc, hyp_features)
@@ -201,7 +201,7 @@ def decode(french, tm, lm, ibm_model, stack_max, distortion_limit, distortion_pe
                 #penalty = extract_distortion_penalty(top_hyp)
                 #temp =  str(s) +" ||| " + str(extract_english(top_hyp)) + " ||| " + str(lm_logprob)+" "+ str(penalty)+" "+ str(extract_tm_pfe(top_hyp))+" "+ str(extract_tm_lex_pfe(top_hyp))+" "+ str(extract_tm_pef(top_hyp))+" "+str(extract_tm_lex_pef(top_hyp))
                 temp =  str(s) +" ||| " + str(extract_english(top_hyp)) + " ||| " + " ".join([str(value) for value in top_hyp.features])
-                print temp
+                #print temp
                 result.append(temp);
         else:
             assert(len(stacks[-1]) > 0)

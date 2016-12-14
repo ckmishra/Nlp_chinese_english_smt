@@ -4,6 +4,8 @@ import sys
 from collections import namedtuple
 import gzip
 
+def extract_data(filepath):
+    return gzip.open(filepath, 'r') if filepath[-3:] == '.gz' else open(filepath, 'r')
 # A translation model is a dictionary where keys are tuples of French words
 # and values are lists of (english, logprob) named tuples. For instance,
 # the French phrase "que se est" has two translations, represented like so:
@@ -15,7 +17,7 @@ phrase = namedtuple("phrase", "english, features, logprob")
 def TM(filename, k, weights=[1,1,1,1]):
   sys.stderr.write("Reading translation model from %s...\n" % (filename,))
   tm = {}
-  for line in open(filename).readlines():
+  for line in extract_data(filename):
     (f, e, features) = line.strip().split(" ||| ")
     # handling four features
     features = features.strip().split()
@@ -41,8 +43,7 @@ def TM(filename, k, weights=[1,1,1,1]):
 # logprob += lm.end(lm_state) # transition to </s>, can also use lm.score(lm_state, "</s>")[1]
 ngram_stats = namedtuple("ngram_stats", "logprob, backoff")
 
-def extract_data(filepath):
-    return gzip.open(filepath, 'r') if filepath[-3:] == '.gz' else open(filepath, 'r')
+
 
 class LM:
   def __init__(self, filename):

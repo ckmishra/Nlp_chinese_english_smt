@@ -16,7 +16,7 @@ optparser.add_option("-n", "--num_sentences", dest="num_sents", default=sys.maxi
 optparser.add_option("--nb", "--nbest", dest="nbest", default=os.path.join("./", "nbest.txt"), help="N-best file")
 optparser.add_option("--tf", "--train_fr", dest="train_fr", default=os.path.join("../toy/", "train.cn"), help="French Training data")
 (opts, _) = optparser.parse_args()
-'''
+
 f_data = "%s" % (opts.french)
 e_data = "%s" % (opts.english)
 if opts.logfile:
@@ -77,29 +77,4 @@ with open('IBMModel1_cn_en.pickle', 'wb') as handle:
     pickle.dump(t1, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 print "Pickling Done.."
-
-'''
-t1 = {}
-with open('../IBMModel1_cn_en.pickle', 'rb') as handle:
-    t1 = pickle.load(handle)
-
-ref_fr = [line.strip().split() for line in open(opts.train_fr[:opts.num_sents])]
-
-token = 0
-
-for i,f in enumerate(ref_fr):
-        token += len(f)
-
-smoothValue = 1/float(token) 
-
-for n,line in enumerate(open(opts.nbest)):
-    (i, sentence, features) = line.strip().split("|||")
-    (i, sentence) = (int(i), sentence.strip())
-    finalscore = 0
-    for (i, f_i) in enumerate(ref_fr[i]):
-        score = 0
-        for (j, e_j) in enumerate(sentence.split()):
-            score += t1.get((f_i,e_j), smoothValue)
-        finalscore +=  math.log10(score)    
-    print finalscore
 

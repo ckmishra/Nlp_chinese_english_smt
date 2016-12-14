@@ -2,8 +2,6 @@
 import optparse, sys, itertools, copy, math, time, os, gzip
 from collections import namedtuple, defaultdict
 from sys import stdin, stdout
-sys.path.append(
-    os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 import models
 import subprocess
 from subprocess import  PIPE, Popen
@@ -12,6 +10,7 @@ import pickle
 
 hypothesis = namedtuple("hypothesis", "logprob, lm_state, predecessor, phrase, coverage, end, logprob_with_fc, features")
 entry = namedtuple("entry", "start, end, phrases") # used in get_all_phrases for keeping triple 
+
 feat_len = 7;
 
 def extract_english(h): 
@@ -19,26 +18,6 @@ def extract_english(h):
 
 def extract_tm_logprob(h):
     return 0.0 if h.predecessor is None else h.phrase.logprob + extract_tm_logprob(h.predecessor)
-
-'''
-def extract_lm_logprob(h):
-    return 0.0 if h.predecessor is None else h.lm_logprob + extract_lm_logprob(h.predecessor)
-
-def extract_distortion_penalty(h):
-    return 0.0 if h.predecessor is None else h.penalty + extract_distortion_penalty(h.predecessor)
-
-def extract_tm_pfe(h):
-    return 0.0 if h.predecessor is None else h.phrase.features[0] + extract_tm_pfe(h.predecessor)
-
-def extract_tm_lex_pfe(h):
-    return 0.0 if h.predecessor is None else h.phrase.features[1] + extract_tm_lex_pfe(h.predecessor)
-
-def extract_tm_pef(h):
-    return 0.0 if h.predecessor is None else h.phrase.features[2] + extract_tm_pef(h.predecessor)
-
-def extract_tm_lex_pef(h):
-    return 0.0 if h.predecessor is None else h.phrase.features[3] + extract_tm_lex_pef(h.predecessor)
-'''
 
 
 # Checking is hypothesis valid 
@@ -116,15 +95,6 @@ def get_future_cost(coverage, f_costs, f_len):
  
                                  
 def decode(french, tm, lm, ibm_model, stack_max, distortion_limit, distortion_penalty, verbose, beam_width, weights, nbest_size):
-    # lambda to learn, can give weight to different features
-    '''
-    lambda_lm = weights[0]
-    lambda_d  = weights[1]
-    lambda_pfe  = weights[2]
-    lambda_lex_pfe  = weights[3]
-    lambda_pef  = weights[4]
-    lambda_lex_pef  = weights[5]
-    '''
     result = [];
 
     sys.stderr.write("Decoding %s...\n" % opts.input)
@@ -178,30 +148,21 @@ def decode(french, tm, lm, ibm_model, stack_max, distortion_limit, distortion_pe
                 
                         #giving distortion penalty
                         penalty =  abs(entry.start - h.end) * math.log10(distortion_penalty)
-                        
+                        logprob += (weights[1] * penalty) 
                         # future cost
                         future_cost = get_future_cost(coverage, f_costs, f_len)
-                        logprob_with_fc = future_cost + (weights[1] * penalty) + logprob  # updated logprob
+                        logprob_with_fc = future_cost + logprob  # updated logprob
                         
                         features = [lm_logprob, penalty] + phrase.features +[align_logProb] # hypothesis features
-                        #print features
-                        #print h.features
                         hyp_features = [x+y for (x,y) in zip(features,h.features)]
-                        #print hyp_features
-
                         
                         new_hypothesis = hypothesis(logprob, lm_state, h, phrase, coverage, entry.end, logprob_with_fc, hyp_features)
                         key = (lm_state, tuple(coverage))
                         if key not in stacks[covered] or stacks[covered][key].logprob < logprob:
                             stacks[covered][key] = new_hypothesis
         if nbest_size > 1 :
-            #assert(len(stacks[-1]) >= nbest_size)
             for top_hyp in sorted(stacks[-1].itervalues(), key=lambda h: -h.logprob)[:nbest_size]:
                 assert(top_hyp.coverage.count(1) == len(top_hyp.coverage))
-                #tm_logprob = extract_tm_logprob(top_hyp);
-                #lm_logprob = extract_lm_logprob(top_hyp)
-                #penalty = extract_distortion_penalty(top_hyp)
-                #temp =  str(s) +" ||| " + str(extract_english(top_hyp)) + " ||| " + str(lm_logprob)+" "+ str(penalty)+" "+ str(extract_tm_pfe(top_hyp))+" "+ str(extract_tm_lex_pfe(top_hyp))+" "+ str(extract_tm_pef(top_hyp))+" "+str(extract_tm_lex_pef(top_hyp))
                 temp =  str(s) +" ||| " + str(extract_english(top_hyp)) + " ||| " + " ".join([str(value) for value in top_hyp.features])
                 #print temp
                 result.append(temp);
@@ -214,8 +175,6 @@ def decode(french, tm, lm, ibm_model, stack_max, distortion_limit, distortion_pe
             result.append(extract_english(top))
 
             if verbose:
-                #tm_logprob = extract_tm_logprob(top)
-                #lm_logprob = top.logprob - tm_logprob
                 lm_logprob=top.features[0]
                 tm_logprob=sum(top.features[2:6])
                 sys.stderr.write("s = %d, LM = %f, TM = %f, Total = %f\n" % (s, lm_logprob, tm_logprob,top.logprob_with_fc))
@@ -233,7 +192,7 @@ def calculate_bleu(bleu_script, trans, gold):
 
 if __name__ == '__main__':
     optparser = optparse.OptionParser()
-    #/usr/shared/CMPT/nlp-class/project
+    #basedir is location where data files are
     #basedir = "/usr/shared/CMPT/nlp-class/project";
     basedir=".."
     optparser.add_option("-i", "--input", dest="input", default= basedir + "/dev/all.cn-en.cn", help="File containing sentences to translate (default=data/input)")
@@ -262,26 +221,30 @@ if __name__ == '__main__':
     tm = models.TM(opts.tm, opts.k);
     ibm_model = {}
     sys.stderr.write("Loading IBM Model 1 Score..")
-    with open('../IBMModel1_cn_en.pickle', 'rb') as handle:
+    
+    with open('./IBMModel1_cn_en.pickle', 'rb') as handle:
         ibm_model = pickle.load(handle)
     sys.stderr.write("Completed IBM Model 1 Score..")
+    
     handle_unk_words(french, tm)
     if opts.weights is None :
         weights = [1/float(feat_len) for _ in xrange(feat_len)]    #Uniform
     else:
         weights = [float(line.strip()) for line in open(opts.weights,'r')]
     # normalize weights
+    '''
+    # is this required ??
     s = sum(weights)
     weights = [w/float(s) for w in weights]
-        
+    '''    
             
     if opts.nbest_value > 1:
         # if nbest generator
         if os.path.exists(opts.nbest): 
             os.remove(opts.nbest)
         weights = [1/float(feat_len) for _ in xrange(feat_len)]    #Uniform
-
-        for epoch in range(2):# 2 epoch or 
+        
+        for epoch in range(3):# 3 epoch or 
             
             nbest=decode(french, tm, lm, ibm_model, opts.s, opts.d, opts.p, opts.verbose, opts.b, weights, opts.nbest_value)
             sys.stderr.write("Decoding done for epoch %d...\n" % epoch)
@@ -291,16 +254,19 @@ if __name__ == '__main__':
             output.close() 
             
             sys.stderr.write("Learning starting for epoch %d...\n" % epoch)
-            #weights = subprocess.check_output(['python', 'learn.py', '--num', str(opts.num_sents)])
             weights = subprocess.check_output(['python', 'learn.py', '-i', opts.nbest, '--num', str(opts.num_sents)])
-
+            #weights = subprocess.check_output(['python', 'learn.py', '-i', opts.nbest, '--num', str(opts.num_sents), '--th', opts.learned])
             # write in learned weights file
             with open(opts.learned,'w') as learned:
                learned.write(weights); 
+               
             weights = [float(line.strip()) for line in open(opts.learned)]
-            
+            '''
+             # normalize weights is this required?
+            s = sum(weights)
+            weights = [w/float(s) for w in weights]
+            '''
             sys.stderr.write("Learning completed for epoch %d, and weights are %s...\n" % (epoch,weights))
-            
     else : 
         # if decoder than
         if os.path.exists(opts.output):

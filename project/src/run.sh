@@ -1,4 +1,5 @@
 #!/bin/sh
+# basedir is location where data files are
 basedir=/usr/shared/CMPT/nlp-class/project
 python decoder.py -k 5 -s 10 -d 6   \
 				 --nbv 100 \

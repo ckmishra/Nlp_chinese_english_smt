@@ -1,20 +1,14 @@
 import math
 from collections import Counter
-import bleu_2
 
 # Collect BLEU-relevant statistics for a single sentence/reference pair.
 # Return value is a generator yielding:
 # (c, r, numerator1, denominator1, ... numerator4, denominator4)
 # Summing the columns across calls to this function on an entire corpus will
 # produce a vector of statistics that can be used to compute BLEU (below)
-def bleu_stats(sentence, ref1, ref2=None, ref3=None, ref4=None):
+def bleu_stats(sentence, reference):
   yield len(sentence)
-  if ref2 != None:
-    reference = ref1 + ref2 + ref3 + ref4
-    yield len(reference)/4
-  else:
-    reference = ref1
-    yield len(reference)
+  yield len(reference)
   for n in xrange(1,5):
     s_ngrams = Counter([tuple(sentence[i:i+n]) for i in xrange(len(sentence)+1-n)])
     r_ngrams = Counter([tuple(reference[i:i+n]) for i in xrange(len(reference)+1-n)])

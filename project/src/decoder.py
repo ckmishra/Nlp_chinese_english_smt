@@ -232,11 +232,10 @@ if __name__ == '__main__':
     else:
         weights = [float(line.strip()) for line in open(opts.weights,'r')]
     # normalize weights
-    '''
+    
     # is this required ??
     s = sum(weights)
     weights = [w/float(s) for w in weights]
-    '''    
             
     if opts.nbest_value > 1:
         # if nbest generator
@@ -261,11 +260,11 @@ if __name__ == '__main__':
                learned.write(weights); 
                
             weights = [float(line.strip()) for line in open(opts.learned)]
-            '''
+            
              # normalize weights is this required?
             s = sum(weights)
             weights = [w/float(s) for w in weights]
-            '''
+            
             sys.stderr.write("Learning completed for epoch %d, and weights are %s...\n" % (epoch,weights))
     else : 
         # if decoder than

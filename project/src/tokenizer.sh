@@ -4,6 +4,7 @@
 #basedir=/usr/shared/CMPT/nlp-class/project
 basedir=".."
 # utility function 
+# need to download tokenizer from https://github.com/moses-smt/mosesdecoder and specify below
 moses_tokenizer=/Users/apple/nmt_project/mosesdecoder/scripts/tokenizer/tokenizer.perl
 tokenize () {
     inp=$1
@@ -25,5 +26,5 @@ tokenize ${basedir}/test/all.cn-en.en2 ${basedir}/test/all.cn-en.en.tok.en2 en
 tokenize ${basedir}/test/all.cn-en.en3 ${basedir}/test/all.cn-en.en.tok.en3 en 
 
 # tokenize output
-tokenize ${basedir}/src/translated.out_baseline_7.55 ${basedir}/src/translated.out_baseline_7.55.tok en
+tokenize ${basedir}/src/translated.out_9.7 ${basedir}/src/translated.out_9.7.tok en
  

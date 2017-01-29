@@ -16,7 +16,6 @@ def get_sample(nbest, tau, alpha):
         s1 = random.choice(nbest)
         s2 = random.choice(nbest)
         if abs(s1.rank - s2.rank) > 10 and ((s1.rank/float(s2.rank)) > 2 or (s2.rank/float(s1.rank)) > 2 ) and fabs(s1.smoothed_scores - s2.smoothed_scores) > alpha:
-        #if fabs(s1.smoothed_scores - s2.smoothed_scores) > alpha:    
             if s1.smoothed_scores > s2.smoothed_scores and (s1,s2) not in sample:
                 sample.append((s1, s2)) 
             elif s2.smoothed_scores > s1.smoothed_scores and (s2,s1) not in sample:

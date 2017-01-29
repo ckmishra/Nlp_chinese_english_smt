@@ -1,0 +1,322 @@
+%
+% File acl2012.tex
+%
+% Contact: Maggie Li (cswjli@comp.polyu.edu.hk), Michael White (mwhite@ling.osu.edu)
+%%
+%% Based on the style files for ACL2008 by Joakim Nivre and Noah Smith
+%% and that of ACL2010 by Jing-Shin Chang and Philipp Koehn
+
+
+\documentclass[11pt,letterpaper]{article}
+\usepackage[letterpaper]{geometry}
+\usepackage{./acl2012}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{tabularx}
+\usepackage{relsize}
+\usepackage[T1]{fontenc}
+\usepackage[noend]{algpseudocode}
+\usepackage{algpseudocode}
+
+\def\textsubscript#1{\ensuremath{_{\mbox{\textscale{.6}{#1}}}}}
+\makeatletter
+\newcommand{\@BIBLABEL}{\@emptybiblabel}
+\newcommand{\@emptybiblabel}[1]{}
+\makeatother
+\usepackage[hidelinks]{hyperref}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\setlength\titlebox{6.5cm}    % Expanding the titlebox
+\usepackage{CJK}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows}
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30]
+\tikzstyle{process} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=orange!30]
+\tikzstyle{decision} = [diamond, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=green!30]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30]
+
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+\title{ Chinese-English Statistical Machine Translation System\\
+\large CMPT 825 Course Project "Team Infinity"}
+
+\author{Chandan Mishra \\
+  {\tt cmishra@sfu.ca} \\\And
+  Pranav Dixit \\
+  {\tt pranavd@sfu.ca} \\\And
+  Neel Tiwari\\
+  {\tt neelt@sfu.ca} \\}
+  
+\date{15-Dec-2015}
+\begin{document}
+\maketitle
+\begin{abstract}
+  This paper is for Chinese to English statistical machine translation system with emphasis on feedback exchange between decoder and reranker. We have used future cost based beam search decoder and PRO reranking algorithm with ordinal regression to build our decoder-reranker system. Our idea here is to use significant features such as language model, translation model and alignment score for our decoder and use feedback loop from the reranker system to improve translation quality. We have improved on the PRO algorithm by combining ordinal regression for better learning in the reranking phase of the system. Our experiment shows +3.5 BLEU score improvement as compared to baseline system having only decoder. We have used Moses tokenizer which further improved the BLEU score by +2.0.
+\end{abstract}
+
+\section{Motivation}
+
+Feedback exchange is widely used for many machine learning tasks for enhancing the performance of the system. As we are using a perceptron-like algorithm to learn weights, the idea of using the approach and see it work, interested us. The feedback exchange module here, however limits the reranker system to local features, features used by the decoder, but it helps in learning the weights for the decoder system, resulting in better translation. 
+
+In addition, having already worked on both the modules of our decoder-reranker system, gave us the base to build on.
+
+\section{Approach}
+
+We are using a phrase-based statistical machine translation method for translation of source Chinese sentence f to target English sentence e.
+
+  \[ {e} = \argmax_e P( \textbf{e} | \textbf{f})\] 
+  \[ \hspace{1.5cm} =\argmax_e  P(\textbf{e} ) * P( \textbf{f} | \textbf{e})
+
+As, the number of candidate target sentences for a source sentence can be exponentially large, we use a future cost based beam search to narrow down on the potential best translation of the source sentence. The beam search decoder generates n-best target candidates for each source sentence. For our model, we use language model feature, 4 translation model feature, distortion feature and IBM Model 1 alignment feature.
+
+The decoder generates n-best target candidate sentences, which are feed into the reranker system to learn the weights that favors the candidates which are similar to the 4 references for the source Chinese sentence. We use the BLEU metric to find similarity between the candidate target sentences and 4 reference sentences. The reranker system learn the weights for the features using a perceptron-like algorithm PRO Algorithm ~\cite{Hopkins:2011:TR:2145432.2145575}. We have enhanced the learning of the weights via PRO Algorithm using ordinal regression ~\cite{Shen04discriminativereranking}. The learned weights are used by the decoder as the feedback from the reranker system to generate new n-best target candidates for the reranker system. We iterate the process till we get a minimal improvement in the BLEU score on the dev data. The final weights generated by the decoder-reranker system are used by the decoder on the test data to generate better translation of source Chinese sentences to target English sentences. 
+
+The figure below describes the flow of our approach:
+
+\begin{figure}[H]
+\begin{center}
+\begin{tikzpicture}[node distance=1.5 cm]
+\node (start) [io, scale=0.4] {Segmented Sentence};
+\node (LM) [io, right of=start,scale=0.4,xshift=2cm] {LM Score};
+\node (TM) [io, left of=start,scale=0.4, xshift=-2cm] {TM Score};
+\node (decoder) [process, below of=start,scale=0.5] {Beam Search Decoder};
+\node (IBM) [io, right of=decoder, scale=0.4, xshift=5 cm] {IBM model 1 };
+\node (nbest) [io, below of=decoder, scale=0.5] {nbest};
+\node (reranker) [process, below of=nbest,scale=0.5] {PRO Reranker};
+\node (ordinal) [process, right of=nbest,xshift=0.5 cm,scale=0.5] {Ordinal};
+\node (isImprove) [decision, below of=reranker,scale=0.5] { Improvement?};
+\node (stop) [startstop, below of=isImprove, scale =0.5] {Stop};
+
+
+\node (learned) [io, right of=reranker,xshift=2 cm,scale=0.5] {Learned Weight}; 
+
+\node (decode) [process, below of=learned,scale=0.5] {Decode};
+\node (output) [io, below of=decode,scale=0.5] {Translated O/P};
+
+
+\draw [arrow] (start) -- (decoder);
+\draw [arrow] (TM) -- (decoder);
+\draw [arrow] (LM) -- (decoder);
+\draw [arrow] (IBM) -- (decoder);
+\draw [arrow] (decoder) -- (nbest);
+\draw [arrow] (nbest) -- (reranker);
+\draw [arrow] (ordinal) -- (reranker);
+\draw [arrow] (reranker) -- (isImprove);
+\draw [arrow] (stop.east) to[ '] + (+1,0) |- node [anchor=south] {weights} (learned.west);
+
+
+\draw [arrow] (learned) -- (decode);
+\draw [arrow] (decode) -- (output);
+
+
+\draw [arrow,green] (isImprove.west) to[ '] + (-1,0) |- node[anchor=east] {yes}  (decoder.west);
+\draw [arrow,red] (isImprove) --node[anchor=west] {no} (stop);
+\end{tikzpicture}
+\caption{\label{font-figure} Basic flow Chart of our system. }
+\end{center}
+\end{figure}
+
+\subsection{Beam Search Decoder}
+\label{sect:pdf}
+The phrase-based machine translation is a NP-hard problem as it has exponential number of choices to choose from to find the best translation of the source sentence. Beam Search  ~\cite{Collins:13} is an optimization algorithm to reduce the search space of a problem. We implement the beam search using a data structure, hypothesis, which holds the coverage of the source sentence words, the features for the hypothesis, the score of the translation and the future cost. Depending on the number of source sentence words covered, we have stacks of hypothesis with the \textit{s} best future costs. For each hypothesis, we choose the phrases that can be added to the hypothesis to create new hypothesis. We add the new hypothesis to a stack only if we do not have a similar hypothesis with a better score in the stack. Once, we cover all the source sentence words, we have a stack with hypothesis for the candidate target language sentences. We generate the n-best candidates from the n-best hypothesis from the last stack, stack representing that all the source sentence words have been covered.
+
+
+\subsection{Future cost}
+ Using Top-N or beam decoder, better translations may appear to be poor translations at the beginning of stack decoding, and they are often pruned out. To better handle this, Future Cost Estimation ~\cite{Koehn:09} was used to measure how expensive it would be to translate the rest
+ of a sentence based on the current hypothesis. Future cost for input sentence can be precomputed using dynamic programming and only looked up while decoding.\\
+ \[\textit{ future\_logprob = future\_cost + local\:logprob}\]
+ 
+\subsection{PRO Algorithm with ordinal regression}
+The PRO Algorithm ~\cite{Hopkins:2011:TR:2145432.2145575} is used to rerank the n-best candidate target sentences generated by the the decoder. The PRO algorithm is a perceptron-like algorithm which learn feature weights for the model using the observations made on the pair-wise samples generated from the n-best candidates. The algorithm compares the model score of the  candidates in the sample with the BLEU metric of the candidates. It learns the weights so as to make the model score consistent with the BLEU score. We have enhanced our PRO reranking algorithm with ordinal regression. The ordinal regression is based on the fact that some pair of candidates are better for learning than others. Let e\textsubscript{i} be the candidate ranked at the i\textsuperscript{th} position for the source sentence, where ranking is defined on the quality of the candidates. For example, knowing e\textsubscript{100} is better than e\textsubscript{101} may be less useful than to know that e\textsubscript{1} is better than e\textsubscript{100}. Hence, we only consider pair of candidates in the sample for learning if their ranks are considerably far away from each other.For our model, we set the updating condition as y\textsubscript{i,j} * 2 < y\textsubscript{i,l}, and y\textsubscript{i,j} + 8 < y\textsubscript{i,l} or y\textsubscript{i,j} + 20 < y\textsubscript{i,l} depending on the stack size used for our decoder, where y\textsubscript{i,j} represents the rank of the j\textsuperscript{th} translation of the i\textsuperscript{th} source sentence. We have tried other methods too, for better learning of weights such as PRO algorithm with splitting. It was due to the better results we got with ordinal regression during our reranker assignment, we follow the ordinal regression approach for our model. 
+\begin{algorithm}
+\caption{Get Sample of PRO Algorithm with ordinal condition}\label{euclid}
+\begin{algorithmic}[1]
+\Procedure{getSample(nbest, tau, alpha)}{}
+\State $\textit{sample} \gets \text{ to return sample }$\\
+\State $\textit{nbest} \gets \text{ shuffle nbest }$\\
+
+\For{\texttt{tau times}}
+           
+\State $\textit{s1} \gets \text{ First candidate}$\\
+\State $\textit{s2} \gets \text{ Second candidate }$\\
+\If {$\textit{ordinalRank}(s1) - ordinalRank(s2) > \textit{20 and ordinalRank}(s1)/ordinalRank(s2)$}
+\If {$\textit{Bleu}(s1) > Bleu(s2)$}
+\State $\textit{sample.append(s1,s2)}$
+\Else 
+\State$\textit{sample.append(s2,s1)}$
+\EndIf
+\Else
+\State$\textit{Continue}$
+\EndIf
+\EndFor
+\State \textbf{return} \emph{sample}.
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{IBM Model 1 Score}
+
+We have used IBM model 1 score as one of the features for our decoder-reranker system. To start with, we build the model \textit{Pr(f | e)} using the conditional probability \textit{t(f | e)} where f is the source language and e is the target language. Let the source sentence be \textbf{f} = ( f\textsubscript{1},...,f\textsubscript{I} ) and target sentence \textbf{e} = ( e\textsubscript{1},...,e\textsubscript{J}). Every source word f\textsubscript{i} has an alignment a\textsubscript{i} which corresponds to an target word e\textsubscript{a\textsubscript{i}}. The alignment vector is given by \textbf{a} = (a\textsubscript{1}.....,a\textsubscript{I}). \[ P( \textbf{f} | \textbf{a}, \textbf{e}) = \prod_{i=1}^{I} t(f\textsubscript{j} | e\textsubscript{a\textsubscript{i}}) \]
+The IBM model 1 score is the sum of all the alignments for the sentence.i.e  \[P( \textbf{f} | \textbf{e}) = \sum_{a} P( \textbf{f} | \textbf{a}, \textbf{e})\]
+ \[\hspace{1.5cm} = \sum_{a} \prod_{i=1}^{I} t(f\textsubscript{j} | e\textsubscript{a\textsubscript{i}})\]
+ \[\hspace{1.5cm} = \prod_{i=1}^{I} \sum_{a} t(f\textsubscript{j} | e\textsubscript{a\textsubscript{i}})\]
+
+And, for non existing word pair  we have used 1/10\textsuperscript{8} as smoothing value.
+
+\section{Experiment}
+
+\subsection{Data}
+The training data is taken from the following sources:
+\begin{itemize}
+\item Hong Kong Parliament parallel corpus
+\item GALE Phase-1 Chinese newsgroup data
+\end{itemize}
+And, it was further divided in various size for the project,
+like Toy (2 K sentence pair), Small (20 K sentence pair), Medium(100 K sentence pair) and Large (2.3 M sentence pair).
+For our experiment, we started with toy data for integrating various module. Our experiment is with first {\bf 500 lines} of dev data for tuning weights. And, evaluated performance on full test data set.
+Language model for training and test is same and filtered from large LM  
+{\en \bf en.gigaword.3g.filtered.train\_dev\_test.arpa.gz} \\
+
+\begin{table}[h]
+\begin{tabular}{|l|l|}
+\hline  & \bf Dev \\ \hline
+\bf TM & /dev-filtered/rules\_cnt.final.out  \\
+\bf Source & /dev/all.cn-en.cn\\
+\bf Reference & /dev/all.cn-en.en0, en1, en2, en3 \\
+\hline
+\end{tabular}
+\caption{\label{font-table} Dev Data. }
+\end{table}
+
+\begin{table}[h]
+\begin{tabular}{|l|l|}
+\hline  & \bf Test \\ 
+\hline
+\bf TM & /test-filtered/rules\_cnt.final.out\\
+\bf Source & /test/all.cn-en.cn \\
+\bf Reference & /test/all.cn-en.en0, en1, en2, en3 \\
+\hline
+\end{tabular}
+\caption{\label{test-data} Test Data. }
+\end{table}
+
+For IBM Model 1 score, we trained our model on the source and reference pair available in {\bf Medium  data set} having 100 K pair.
+
+\subsection{Code}
+\label{sec:length}
+
+We mainly used codes from homework 3, homework 4 and homework 5. To automate feedback looping mechanism, we written utility shell script and  integrated {\em multi-bleu.perl} for final BLEU score computation. We have provided script to use  moses tokenizer as well.
+\begin{table}[h]
+\begin{tabular}{|l|l|}
+\hline \bf & Test \\ 
+\hline
+\bf HW3 & align.py \\
+\bf HW4 & decoder.py, models.py\\
+\bf HW5 & learn.py, bleu.py, score-reranker \\
+\bf External & multi-bleu.perl, moses tokenizer \\
+\hline
+\end{tabular}
+\caption{\label{code} Codes from homework. }
+\end{table}
+
+{\noindent}{\bf align.py} - EM algorithm for lexical word alignment, saved model as pickle to use and get alignment score during decoding time.\\
+{\bf decoder.py } - beam search decoder with Future cost estimation algorithm;\\
+{\bf learn.py } - PRO reranking algorithm with ordinal regression.\\
+{\bf bleu.py } - Modified existing file to handle four references.
+
+
+\subsection{Experimental Setup}
+For our experiment, we have defined four different kind of models as mentioned below, In all of these settings,we are taking stack size (s) = 10, Number of translation per phrases(k) = 6 and distortion limit of 6 or more with penalty. In our reranker we are by default using ordinal regression to better classify positive and negative examples.
+Also, we provided shell script {\bf ./run.sh} for running below models. 
+
+\begin{itemize}
+\item {\bf Baseline:}  Decoder having basic six features
+\begin{itemize}
+\item LMScore: the language model score for tranlation candidate
+\item ReorderingScore: the sum of the distortion penalties for this translation
+\item p(f|e): the inverse phrase translation probability
+\item lex(f|e): the inverse lexical weighting
+\item p(e|f): the direct phrase translation probability
+\item lex(e|f): the direct lexical weighting
+\end{itemize}
+
+\item {\bf Baseline + IBM Model 1 Score:}
+\noindent Additionally added IBM model 1 alignment score, as in homework 5 we have observed that it was a significant feature which improved our BLEU score by minimum of +1.2.
+\item {\bf Baseline + Reranking:}
+\noindent Having six features with feedback loop mechanism, we loop only for 3 epochs considering time taken by decoder.
+\item {\bf Baseline + IBM Model 1 Score + Reranking:}
+This is combination of model 2 and 3.
+\end {itemize}
+
+
+\section{Results}
+Results in Table ~\ref{stack_ten} is calculated using {\bf \em multi-bleu.perl} and also verified by { \bf \em score-reranker.py}
+Using parameters stack size s = 10, number of translation k = 5 and distortion limit = 6 and trained on top 500 dev data.
+\begin{table}[h]
+\label{ssec:table4}
+
+\begin{center}
+\begin{tabular}{|l|l|r|}
+\hline \bf Models &  \bf BLEU \\ \hline
+{\bf Baseline}  & 6.98 \\
+{\bf Baseline+IBM Model} 1  & 7.39 \\
+{\bf Baseline+ Reranker} & 7.23 \\
+{\bf Baseline+IBM Model 1+Reranker} & 9.7  \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{stack_ten} Machine Translation Evaluation trained on 500 Dev data}
+\end{table}
+
+Further on model 4, we done one trial run with stack size 100, k=5 and with and without distortion limit and got  results shown in Table ~\ref{stack_100}. It clerly shows without limiting distortion BLUE score improves and it is obvious as Chinese and English alignment is quite distorted. However, one point we want to highlight even though we are not restricting distortion but giving distortion penalty in both cases.
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|l|l|r|}
+\hline  & \bf Baseline+IBM Model 1+ Reranker  \\ \hline
+\bf d=6 &  10.35 \\
+\bf d=NA & 11.75 \\
+\hline
+\end{tabular}
+\end{center}
+\caption{\label{stack_100} with s=100, k=5, dev data = 500 }
+\end{table}\\
+\noindent{\bf Sample Translation:}\\
+
+\noindent{\bf Source Sentence:} 
+\begin{CJK}{UTF8}{gbsn}
+国际 原子能 总 署 已 警告 , 假如 平壤 拒绝 放弃 核子 计划 , 它 可能 要求 安理会 采取 行动 。
+\end{CJK}\\
+
+\noindent {\bf Baseline translation: } 
+pyongyang unscr abandon nuclear warning may request refused international atomic energy scheme , if taken action , it had has . \\
+ 
+\noindent {\bf Baseline+ IBM Model 1+ Rereanker: }  security council refusal to give up nuclear if it may request an atomic energy total taken action scheme has already warned department , pyongyang ,     international.\\
+
+\indent As we can see last translation is having meaningful sentence compared to baseline translation, and reason for that is better language model score in latter.
+
+\section{Analysis of the Results}
+There are few interesting observation we have found during our experiment.\\
+1. {\bf Distortion } -   There are wide distortion possible between Chinese and English phrases, as we can observe from given alignment files. So, by allowing distortion with higher value improves BLEU score which can be verified using results in Table ~\ref{stack_100}.  \\
+
+2. {\bf Reranking } - Here, PRO reranking algorithm behaves inconsistently  as it is based on random sampling. During HW 5,  we observed that PRO reranking was not that efficient. However,  with introduction of ordinal regression, where we are assigning rank to candidates and taking two pair which are having rank difference of at least 8(in case of StackSize=8) or 20(if stack size = 20), it helps in better learning of weights.   \\
+
+3. {\bf Stack Size } - Again, larger stack size leads to better translation as we compared in Table ~\ref{stack_ten} and Table ~\ref{stack_100} \\
+
+4. {\bf Tokenization of output translation} - Using Moses tokenizer, we are able to improve BLEU score by upto +2.0. After applying tokenizer on model 4 output with 9.7, we got improvement of +2.29 to {\bf 11.99}.\\
+
+5. {\bf UNK Chinese words} - We observed that there were not many unknown Chinese words after translation. Hence, did not went ahead to handle the unknown words as that would have resulted in only little improvement over the model we already have.
+
+\section{Future Work}
+We would like to handle UNK Chinese words, and made code capable of running on multi processor or GPU. Also, given a superior hardware we can try on larger dataset which will surely improve BLEU score. 
+\bibliography{nlp}
+\bibliographystyle{acl2012}
+
+\end{document}
+
+
+

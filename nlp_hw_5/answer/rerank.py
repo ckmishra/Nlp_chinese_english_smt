@@ -1,34 +1,23 @@
 #!/usr/bin/env python
 import optparse, sys, os, math
 from collections import namedtuple
+import feature_util
 
 optparser = optparse.OptionParser()
 optparser.add_option("-n", "--nbest", dest="nbest", default=os.path.join("../data", "test.nbest"), help="N-best file")
 optparser.add_option("-f", "--test_fr", dest="test_fr", default=os.path.join("../data", "test.fr"), help="French Training data")
 optparser.add_option("-w", "--weight-file", dest="weights", default=None, help="Weight filename, or - for stdin (default=use uniform weights)")
-optparser.add_option("--af", "--align_score_feature", dest="align_score_feature", default=os.path.join("./", "align.train.feat"), help="Alignment score Feature")
+optparser.add_option("--af", "--align_score_feature", dest="align_score_feature", default=os.path.join("./", "align.test.feat"), help="Alignment score Feature")
 
 (opts, _) = optparser.parse_args()
 
-
-def is_ascii(s):
-    return all(ord(c) < 128 for c in s)
-
-def quotationMatch(sentence):
-        count = 0
-        for i in sentence:
-            if i == '\"':
-                count += 1
-            elif i == '\"':
-                count -= 1
-        return count
     
-def create_extra_feature(nbest, src):
+def create_word_features(nbest, src):
     for n, line in enumerate(open(opts.nbest)):
         (i, sentence, features) = line.strip().split("|||")    
         translated_len_feat = len(sentence.strip().split())
-        untranslated_feat = [word for word in sentence.strip().split() if not(is_ascii(word))] 
-        yield  str(-1*(translated_len_feat)) +" "+ str(-1*(len(untranslated_feat)))+" " +str(-1*quotationMatch(sentence))
+        untranslated_feat = [word for word in sentence.strip().split() if not(feature_util.is_ascii(word))] 
+        yield  str(math.log10(translated_len_feat)) +" "+ str((len(untranslated_feat))) +" "+str(feature_util.quotationMatch(sentence))
 
 w = None
 if opts.weights is not None:
@@ -41,13 +30,14 @@ translation = namedtuple("translation", "english, score")
 nbests = []
 
 src = [line.strip().split() for line in open(opts.test_fr)]
-# alignment score feature
+# IBM model 1 score feature for test data
 align_features = []
 for n, feat in enumerate(open(opts.align_score_feature)):
     align_features.append(feat)
+
 # word count specific feature    
 wc_features = []
-for n, feat in enumerate(create_extra_feature(opts.nbest, src)):
+for n, feat in enumerate(create_word_features(opts.nbest, src)):
     wc_features.append(feat)
 
 for n,line in enumerate(open(opts.nbest)):

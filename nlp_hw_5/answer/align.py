@@ -24,7 +24,7 @@ if opts.logfile:
     logging.basicConfig(filename=opts.logfile, filemode='w', level=logging.INFO)
 bitext = [[sentence.strip().split() for sentence in pair] for pair in zip(open(f_data), open(e_data))[:opts.num_sents]]
 
-
+'''
 def model(f_data,e_data):
     sys.stderr.write("Training with EM Method ...")
     f_count = defaultdict(int)
@@ -46,7 +46,7 @@ def model(f_data,e_data):
     for (k, (f_i, e_j)) in enumerate(fe_count.keys()):
         t[(f_i,e_j)] = 1 / float(len(f_count))
     
-    for i in range(0):
+    for i in range(1):
         sys.stderr.write("Iteration %d " %i)
         t_e_count = defaultdict(float)
         t_fe_count = defaultdict(float)
@@ -72,17 +72,19 @@ def model(f_data,e_data):
     return t
 
 t1 = model(f_data, e_data)
-
+'''
+t1 = {}
+with open('../data/IBMMODEL1.pickle', 'rb') as handle:
+    t1 = pickle.load(handle)
 
 ref_fr = [line.strip().split() for line in open(opts.train_fr)]
 
-f_count = defaultdict(int)
+token = 0
 
 for i,f in enumerate(ref_fr):
-    for f_i in set(f):
-        f_count[f_i] += 1
+        token += len(f)
 
-smoothValue = 1/len(f_count) 
+smoothValue = 1/float(token) 
 
 for n,line in enumerate(open(opts.nbest)):
     (i, sentence, features) = line.strip().split("|||")
@@ -91,7 +93,7 @@ for n,line in enumerate(open(opts.nbest)):
     for (i, f_i) in enumerate(ref_fr[i]):
         score = 0
         for (j, e_j) in enumerate(sentence.split()):
-            score += t1.get([(f_i,e_j)], smoothValue)
+            score += t1.get((f_i,e_j), smoothValue)
         finalscore +=  math.log10(score)    
     print finalscore
 

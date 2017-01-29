@@ -1,2 +1,2 @@
 Implemented baseline.
-Implemented Alignment score feature. 
+Implemented IBM Model 1 score  and untranslated(using ASCII code) words feature.

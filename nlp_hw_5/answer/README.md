@@ -1,39 +1,30 @@
+Doc
+-----------------
 
-Pseudocode
-------------------
+We got better improvement with IBM model 1.
+							Test
+------------------------------------------|
+| Baseline     			 |  24.46		  |
+|+ IBM Model 1			 |	25.23		  |
+|+ IBM Model 1 + Ranking |	26.55		  |
 
-Parameters:
-    tau: samples generated from n-best list per input sentence (set to 5000)
-    alpha: sampler acceptance cutoff (set to 0.1)
-    xi: training data generated from the samples tau (set to 100)
-    eta: perceptron learning rate (set to 0.1)
-    epochs: number of epochs for perceptron training (set to 5)
+We also added other features such as word count, untranslated word and balanced double quotes. However, these feature are not helping much in improving BLUE score. 
 
-for each sentence i:
-    collect all the n-best outputs for i
-    for each candidate c in the n-best list:
-        compute the bleu score b (using bleu.py) for c
-        append (c,b) to nbests[i]
+We attached our reranking.py along with alignment features.
+"align.train.feat" = IBM model 1 score on train.nbest 
+"align.test.feat"  = IBM model 1 score on test.nbest
 
-for i = 1 to epochs:
-    for nbest in nbests:
-        get_sample():
-            initialize sample to empty list 
-            loop tau times:
-                randomly choose two items from nbest list, s1 and s2:
-                if fabs(s1.smoothed_bleu - s2.smoothed_bleu) > alpha:
-                    if s1.smoothed_bleu > s2.smoothed_bleu:
-                        sample += (s1, s2)
-                    else:
-                        sample += (s2, s1)
-                else:
-                    continue
-            return sample
-        sort the tau samples from get_sample() using s1.smoothed_bleu - s2.smoothed_bleu
-        keep the top xi (s1, s2) values from the sorted list of samples
-        do a perceptron update of the parameters theta:
-            if theta * s1.features <= theta * s2.features:
-                mistakes += 1
-                theta += eta * (s1.features - s2.features) # this is vector addition!
-return theta
+Files :
+for reproducing 26.55 Blue score use below files on our /answer/rerank.py. 
+learned.weight
+output - best output
+
+Other approaches and further analysis:
+
+The problem here is not a linearly splittable problem, dividing the training examples into good and poor examples.
+
+Successful in making the model linear:
+Considered only training sentences with 300 candidate sentences for training. 
+However, this does not cover the information for the sentences with less candidate sentences(shorter sentences).The Bleu score for the this
+approach was 25.98.
 

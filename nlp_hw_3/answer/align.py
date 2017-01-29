@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import optparse, sys, os, logging
 from collections import defaultdict
-#from datashape.typesets import maxtype
+from datashape.typesets import maxtype
 
 optparser = optparse.OptionParser()
 optparser.add_option("-d", "--datadir", dest="datadir", default="data", help="data directory (default=data)")
@@ -50,7 +50,7 @@ def model(f_data,e_data):
     for (k, (f_i, e_j)) in enumerate(fe_count.keys()):
         t[(f_i,e_j)] = 1 / float(len(f_count))
     
-    for i in range(1):
+    for i in range(15):
         sys.stderr.write("Iteration %d " %i)
         t_e_count = defaultdict(float)
         t_fe_count = defaultdict(float)
